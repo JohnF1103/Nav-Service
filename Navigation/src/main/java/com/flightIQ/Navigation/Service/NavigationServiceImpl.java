@@ -13,17 +13,17 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         // Remove static keyword from declaration when finished testing!
 
-        double EARTH_RADIUS_MILES = 3958.8; 
+        double earthRadiusNauticalMiles = 3443.92; 
 
         // Retrieve the destination airport's coordinates
         String dest_latStr; 
         String dest_longStr; 
 
         // Convert the coordinates to doubles
-        double latitude = Double.parseDouble(latitudeStr); 
-        double longitude = Double.parseDouble(longitudeStr); 
-        double dest_latitude = 40.6446; // hard-coding JFK coordinates for now
-        double dest_longitude = -73.7797; // hard-coding JFK coordinates for now
+        double latitude = Math.toRadians(Double.parseDouble(latitudeStr)); 
+        double longitude = Math.toRadians(Double.parseDouble(longitudeStr)); 
+        double dest_latitude = Math.toRadians(40.6446); // hard-coding JFK coordinates for now
+        double dest_longitude = Math.toRadians(-73.7797); // hard-coding JFK coordinates for now
 
         double diff_latitude = dest_latitude - latitude; 
         double diff_longitude = dest_longitude - longitude; 
@@ -35,10 +35,10 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         double b = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
 
-        double distance = EARTH_RADIUS_MILES * b; 
+        double distance = earthRadiusNauticalMiles * b; 
 
 
-        return distance; // will change
+        return distance; 
     }
 
 
@@ -77,7 +77,7 @@ public class NavigationServiceImpl implements Navigation_svc {
 
     public static void main(String[] args) {
         // FOR TESTING PURPOSES
-        double distFromMyHouseToJFK = haversine_formula("40.86827", "-73.28612", "KJFK"); 
+        double distFromMyHouseToJFK = haversine_formula("42.72476", "-73.67652", "KJFK"); 
         System.out.println(distFromMyHouseToJFK);
     }
 
