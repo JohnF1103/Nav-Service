@@ -7,22 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*; 
 
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
     public static void getATISTest() {
-        String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KJFK";
-        RestTemplate restTemplate = new RestTemplate(); 
-        String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+        // For testing purposes only
 
-        //parse out ATIS 
-        System.out.println(apiResponseJSON); 
+        // String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KLAX";
+        // RestTemplate restTemplate = new RestTemplate(); 
+        // String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+
+        // // parse out ATIS 
+        // String atisResponse = parseATIS(apiResponseJSON); 
+        // System.out.println(atisResponse);
+
     }
 
 
@@ -36,18 +37,15 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
             try {
-                //make GET REQ using https://www.geeksforgeeks.org/spring-resttemplate/
+                // Send get request to url to retrieve JSON object
                 // will replace with JFK with DestAirportCode at some point
                 String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KJFK";
                 RestTemplate restTemplate = new RestTemplate(); 
                 String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
 
                 // parse out ATIS 
-                System.out.println(apiResponseJSON); 
+                atisResponse = parseATIS(apiResponseJSON); 
 
-
-
-                // atisResponse = //maybe global var in function. 
 
                 
             } catch (Exception e) {
@@ -63,10 +61,36 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
 
+ 
+    public String parseATIS(String apiResponseJSON) {
+
+        /*
+         * Add static if testing
+         * Remove static if done testing
+         */
+
+        String atisOutput = ""; 
+
+        JSONObject result = new JSONObject(apiResponseJSON);
+
+        if (result.has("ATIS") && !result.isNull("ATIS")) {
+            Object atisCodeObj = result.get("ATIS"); 
+            atisOutput += "ATIS: " + atisCodeObj; 
+        }
+
+        return atisOutput; 
+    }
+
+
+
+
 
     public double haversine_formula(String latitudeStr, String longitudeStr, String DestAirportCode) {
 
-        // Add static to function declaration for testing purposes
+        /*
+         * Add static if testing
+         * Remove static if done testing
+         */
 
         double earthRadiusNauticalMiles = 3443.92; 
 
@@ -94,6 +118,8 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         return distance; 
     }
+
+
 
 
     public static void main(String[] args) {
