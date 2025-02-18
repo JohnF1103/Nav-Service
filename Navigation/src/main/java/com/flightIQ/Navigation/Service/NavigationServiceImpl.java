@@ -1,17 +1,72 @@
 package com.flightIQ.Navigation.Service;
 
-
-
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
+    public static void getATISTest() {
+        String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KJFK";
+        RestTemplate restTemplate = new RestTemplate(); 
+        String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
 
-    public static double haversine_formula(String latitudeStr, String longitudeStr, String DestAirportCode) {
+        //parse out ATIS 
+        System.out.println(apiResponseJSON); 
+    }
 
-        // Remove static keyword from declaration when finished testing!
+
+    @Override
+    public String GetATISOFDestination(String latitude, String longitude, String DestAirportCode) {
+        // TODO Auto-generated method stub
+
+        String atisResponse = "";
+        
+        if (haversine_formula(latitude, longitude, DestAirportCode) <= 10) {
+
+
+            try {
+                //make GET REQ using https://www.geeksforgeeks.org/spring-resttemplate/
+                // will replace with JFK with DestAirportCode at some point
+                String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KJFK";
+                RestTemplate restTemplate = new RestTemplate(); 
+                String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+
+                // parse out ATIS 
+                System.out.println(apiResponseJSON); 
+
+
+
+                // atisResponse = //maybe global var in function. 
+
+                
+            } catch (Exception e) {
+                System.out.printf("Error retrieving Airport ATIS Code."); 
+            } 
+
+        }
+
+
+        return atisResponse;
+    }
+
+
+
+
+
+    public double haversine_formula(String latitudeStr, String longitudeStr, String DestAirportCode) {
+
+        // Add static to function declaration for testing purposes
 
         double earthRadiusNauticalMiles = 3443.92; 
 
@@ -37,48 +92,18 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         double distance = earthRadiusNauticalMiles * b; 
 
-
         return distance; 
-    }
-
-
-
-    @Override
-    public String GetATISOFDestination(String latitude, String longitude, String DestAirportCode) {
-        // TODO Auto-generated method stub
-
-        String atisResponse = "";
-        
-        // if (haversine_formula(latitude, longitude, DestAirportCode) <= 10) {
-
-
-        //     try {
-        //         //make GET REQ using https://www.geeksforgeeks.org/spring-resttemplate/
-
-        //         freqAPI_reponse = https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KPMP
-
-        //         //parse out ATIS 
-
-        //         atisResponse = //maybe global var in function. 
-
-                
-        //     } catch {
-
-        //         throw exception
-
-        //     } 
-
-        // }
-
-
-        return atisResponse;
     }
 
 
     public static void main(String[] args) {
         // FOR TESTING PURPOSES
-        double distFromMyHouseToJFK = haversine_formula("42.72476", "-73.67652", "KJFK"); 
-        System.out.println(distFromMyHouseToJFK);
+        // double distFromMyHouseToJFK = haversine_formula("42.72476", "-73.67652", "KJFK"); 
+        // System.out.println(distFromMyHouseToJFK);
+
+        // String JSONResult = GetATISOFDestination("42.72476", "-73.67652", "KJFK"); 
+
+        // getATISTest(); 
     }
 
 }
