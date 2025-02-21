@@ -34,36 +34,27 @@ public class NavigationServiceImpl implements Navigation_svc {
         String atisResponse = "";
         
         if (haversine_formula(latitude, longitude, DestAirportCode) <= 10) {
-
-
             try {
                 // Send get request to url to retrieve JSON object
-                // will replace with JFK with DestAirportCode at some point
-                String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KJFK";
+                String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode={station}";
+                String endpoint = apiUrl.replace("{station}", DestAirportCode);
                 RestTemplate restTemplate = new RestTemplate(); 
-                String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+                String apiResponseJSON = restTemplate.getForObject(endpoint, String.class); 
 
                 // parse out ATIS 
                 atisResponse = parseATIS(apiResponseJSON); 
 
-
-                
             } catch (Exception e) {
                 System.out.printf("Error retrieving Airport ATIS Code."); 
             } 
-
         }
-
 
         return atisResponse;
     }
 
 
 
-
- 
     public String parseATIS(String apiResponseJSON) {
-
         /*
          * Add static if testing
          * Remove static if done testing
@@ -83,10 +74,7 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
 
-
-
     public double haversine_formula(String latitudeStr, String longitudeStr, String DestAirportCode) {
-
         /*
          * Add static if testing
          * Remove static if done testing
@@ -118,7 +106,6 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         return distance; 
     }
-
 
 
 
