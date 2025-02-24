@@ -17,6 +17,8 @@ public class NavigationServiceController {
 
     @Autowired
     private Navigation_svc navservice;
+    
+    
 
     @GetMapping(value = "/getATISOfDestination")
     public ResponseEntity<String> getATISOfDestination(@RequestParam String airportCode) {

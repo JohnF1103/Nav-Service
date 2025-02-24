@@ -1,9 +1,6 @@
 package com.flightIQ.Navigation.Service;
 
-
-
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
@@ -41,5 +38,4 @@ public class NavigationServiceImpl implements Navigation_svc {
         }
         return response;
     }
-
 }
