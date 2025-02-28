@@ -18,7 +18,6 @@ public class NavigationServiceController {
     @Autowired
     private Navigation_svc navservice;
     
-    
 
     @GetMapping(value = "/getATISOfDestination")
     public ResponseEntity<String> getATISOfDestination(@RequestParam String airportCode) {
@@ -27,5 +26,15 @@ public class NavigationServiceController {
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+    
+    @GetMapping(value="/getAirportDetails")
+    public ResponseEntity<String> getAirportDetails(@RequestParam String icaoCode) {
+    	try {
+    		return ResponseEntity.ok(navservice.getAirportFromIdent(icaoCode));
+    	}
+    	catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid input");
+    	}
     }
 }
