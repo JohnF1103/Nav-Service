@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-
+// Integration tests to test REST endpoints
 @EnabledIfSystemProperty(named = "it.cloudsql", matches = "true")
 @TestPropertySource(locations = "/Navigation/src/main/resources/application-secret.properties")
 @ExtendWith(SpringExtension.class)
