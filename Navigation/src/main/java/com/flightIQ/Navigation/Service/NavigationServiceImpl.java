@@ -62,7 +62,6 @@ public class NavigationServiceImpl implements Navigation_svc {
     	return airport;
     }
 
-
 	@Override
 	public Airport getAirportFromICAO(String icaoCode) {
 		Airport airport = airportRepository.findByIcao(icaoCode)
