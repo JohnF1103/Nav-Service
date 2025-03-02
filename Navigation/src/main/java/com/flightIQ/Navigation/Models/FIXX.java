@@ -19,7 +19,7 @@ public class FIXX {
 	
 	@Id
 	@Column(name="fix")
-	private String fix_id;
+	private String fixId;
 	
 	@Column(name="lat")
 	private double latitude;
@@ -30,7 +30,7 @@ public class FIXX {
 	@Override
 	public String toString() {
 	    return "FIXX{" +
-	            "fix_id='" + fix_id + '\'' +
+	            "fix_id='" + fixId + '\'' +
 	            ", latitude=" + latitude +
 	            ", longitude=" + longitude +
 	            '}';

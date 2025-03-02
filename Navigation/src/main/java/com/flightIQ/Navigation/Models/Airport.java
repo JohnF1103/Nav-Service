@@ -14,13 +14,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="FAA_Airports")
+@Table(name="\"FAA_Airports\"")
 public class Airport {
 	@Id
 	@Column(name = "IDENT")
 	private String ident;
 	
-	@Column(name = "ICAO_CODE")
+	@Column(name = "ICAO_ID")
 	private String icao;
 	
 	@Column(name = "NAME")

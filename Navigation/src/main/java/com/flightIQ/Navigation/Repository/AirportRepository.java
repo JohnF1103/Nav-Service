@@ -10,5 +10,5 @@ import com.flightIQ.Navigation.Models.Airport;
 @Repository
 public interface AirportRepository extends JpaRepository<Airport, String> {
 	Optional<Airport> findByIdent(String ident);
-	Airport findByIcaoCode(String icaoCode);
+	Optional<Airport> findByIcao(String icao);
 }
