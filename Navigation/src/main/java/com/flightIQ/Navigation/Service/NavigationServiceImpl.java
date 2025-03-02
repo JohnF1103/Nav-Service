@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Repository.AirportRepository;
+import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
@@ -54,9 +55,9 @@ public class NavigationServiceImpl implements Navigation_svc {
     }
     
     @Override
-    public Airport getAirportFromIDENT(String ident) {
-    	Airport airport = airportRepository.findByIdent(ident)
-    			.orElseThrow(() -> new RuntimeException("Airport does not exist!"));
+    public Airport getAirportFromIDENT(String identCode) {
+    	Airport airport = airportRepository.findByIdent(identCode)
+    			.orElseThrow(() -> new AirportNotFoundException("Airport does not exist with IDENT: " + identCode));
     	
     	return airport;
     }
@@ -65,7 +66,7 @@ public class NavigationServiceImpl implements Navigation_svc {
 	@Override
 	public Airport getAirportFromICAO(String icaoCode) {
 		Airport airport = airportRepository.findByIcao(icaoCode)
-						  .orElseThrow(() -> new RuntimeException("Airport does not exist!"));
+						  .orElseThrow(() -> new AirportNotFoundException("Airport does not exist with ICAO: " + icaoCode));
 		
 		return airport;
 	}

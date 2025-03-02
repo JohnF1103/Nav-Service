@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Service.Navigation_svc;
 
@@ -48,6 +49,9 @@ public class NavigationServiceController {
         	// Re-throw ResponseStatusException to preserve the original status code
     		throw e;
     	}
+    	catch (AirportNotFoundException e) {
+    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    	}
     	catch (Exception e) {
     		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
     	}
@@ -69,6 +73,9 @@ public class NavigationServiceController {
         catch (ResponseStatusException e) {
         	throw e;
         }
+        catch (AirportNotFoundException e) {
+    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    	}
         catch (Exception e) {
         	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
         }
