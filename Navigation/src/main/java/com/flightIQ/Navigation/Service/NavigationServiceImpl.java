@@ -1,5 +1,7 @@
 package com.flightIQ.Navigation.Service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,42 +24,51 @@ public class NavigationServiceImpl implements Navigation_svc {
         // TODO Auto-generated method stub
 
 
-        String response = ""
+        String response = "";
         
-        if distance formula (x,y) , DestAirportCode <= 10{
+        //if distance formula (x,y) , DestAirportCode <= 10{
 
 
-            try{
-                //make GET REQ using https://www.geeksforgeeks.org/spring-resttemplate/
-
-                freqAPI_reponse = https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KPMP
-
-                //parse out ATIS 
-
-                String ATIS_response = //maybe global var in function. 
-
-                response = ATIS_response;
-                
-            }catch{
-
-                trow exception
-
-            }
-
-        }else{
-
-            response = ""
-        }
+//            try{
+//                //make GET REQ using https://www.geeksforgeeks.org/spring-resttemplate/
+//
+//                freqAPI_reponse = https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KPMP
+//
+//                //parse out ATIS 
+//
+//                String ATIS_response = //maybe global var in function. 
+//
+//                response = ATIS_response;
+//                
+//            }catch{
+//
+//                trow exception
+//
+//            }
+//
+//        }else{
+//
+//            response = ""
+//        }
         return response;
     }
     
     @Override
-    public String getAirportFromIdent(String ident) {
+    public Airport getAirportFromIDENT(String ident) {
     	Airport airport = airportRepository.findByIdent(ident)
     			.orElseThrow(() -> new RuntimeException("Airport does not exist!"));
     	
-    	return airport.toString();
+    	return airport;
     }
+
+
+	@Override
+	public Airport getAirportFromICAO(String icaoCode) {
+		Airport airport = airportRepository.findByIcao(icaoCode)
+						  .orElseThrow(() -> new RuntimeException("Airport does not exist!"));
+		
+		return airport;
+	}
     
     
 }
