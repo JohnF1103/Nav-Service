@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Service.Navigation_svc;
 
 
@@ -28,13 +30,47 @@ public class NavigationServiceController {
         }
     }
     
-    @GetMapping(value="/getAirportDetails")
-    public ResponseEntity<String> getAirportDetails(@RequestParam String icaoCode) {
+    @GetMapping(value="/getAirportByIdent")
+    public ResponseEntity<Airport> getAirportByIdent(@RequestParam String identCode) {
     	try {
-    		return ResponseEntity.ok(navservice.getAirportFromIdent(icaoCode));
+    		if (identCode.length() != 3) {
+    			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDENT code must have 3 letters");
+            }
+    		
+    		// Regex expression to check input contains only alphabets and numbers
+        	if (!identCode.matches("[A-Za-z0-9]{3}")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must contain only letters and numbers");
+            }
+    		
+    		return ResponseEntity.ok(navservice.getAirportFromIDENT(identCode));
+    	}
+    	catch (ResponseStatusException e) {
+        	// Re-throw ResponseStatusException to preserve the original status code
+    		throw e;
     	}
     	catch (Exception e) {
-    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid input");
+    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
     	}
+    }
+    
+    @GetMapping(value="/getAirportByIcao")
+    public ResponseEntity<Airport> getAirportByIcao(@RequestParam String icaoCode) {
+        try {
+        	if (icaoCode.length() != 4) {
+            	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must have 4 letters"); 
+            }
+        	
+        	if (!icaoCode.matches("[A-Za-z0-9]{4}")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must contain only letters and numbers");
+            }
+        	
+            return ResponseEntity.ok(navservice.getAirportFromICAO(icaoCode));
+        }
+        catch (ResponseStatusException e) {
+        	throw e;
+        }
+        catch (Exception e) {
+        	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
+        }
     }
 }
