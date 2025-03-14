@@ -13,23 +13,32 @@ import java.util.*;
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
+    /* 
     public static void getATISTest() {
         // For testing purposes only
 
-        // String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KLAX";
-        // RestTemplate restTemplate = new RestTemplate(); 
-        // String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+        String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KLAX";
+        RestTemplate restTemplate = new RestTemplate(); 
+        String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
 
-        // // parse out ATIS 
-        // String atisResponse = parseATIS(apiResponseJSON); 
-        // System.out.println(atisResponse);
+        // parse out ATIS 
+        String atisResponse = parseATIS(apiResponseJSON); 
+        System.out.println(atisResponse);
 
-    }
+    } */
 
 
     @Override
     public String GetATISOFDestination(String latitude, String longitude, String DestAirportCode) {
         // TODO Auto-generated method stub
+
+        /*
+            TODO FOR RUSSELL: When the database connection is working, write a simple SQL query that 
+                                returns the latitiude and longitiude for DestAirportCode
+
+                              When that is successful, modify the haversine formula function so that it takes
+                                in the destination airport lat and long (replace hard-coded JFK coordinates)
+        */ 
 
         String atisResponse = "";
         
@@ -109,14 +118,15 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
 
+    /* 
     public static void main(String[] args) {
         // FOR TESTING PURPOSES
-        // double distFromMyHouseToJFK = haversine_formula("42.72476", "-73.67652", "KJFK"); 
-        // System.out.println(distFromMyHouseToJFK);
+        double distFromMyHouseToJFK = haversine_formula("42.72476", "-73.67652", "KJFK"); 
+        System.out.println(distFromMyHouseToJFK);
 
-        // String JSONResult = GetATISOFDestination("42.72476", "-73.67652", "KJFK"); 
+        String JSONResult = GetATISOFDestination("42.72476", "-73.67652", "KJFK"); 
 
-        // getATISTest(); 
-    }
+        getATISTest(); 
+    } */
 
 }
