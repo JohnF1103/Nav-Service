@@ -1,9 +1,18 @@
 package com.flightIQ.Navigation.Service;
 
+import java.util.Optional;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.flightIQ.Navigation.Models.Airport;
+import com.flightIQ.Navigation.Repository.AirportRepository;
+import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
