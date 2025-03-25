@@ -3,7 +3,8 @@ package com.flightIQ.Navigation.Service;
 import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.flightIQ.Navigation.Models.Airport;
@@ -124,6 +125,36 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         return distance; 
     }
+
+
+
+    @Autowired
+	private AirportRepository airportRepository;
+
+    public void AirportService(AirportRepository airportRepository) {
+        this.airportRepository = airportRepository;
+    }
+
+
+
+    @Override
+    public Airport getAirportFromIDENT(String identCode) {
+        Airport airport = airportRepository.findByIdent(identCode)
+                .orElseThrow(() -> new AirportNotFoundException("Airport does not exist with IDENT: " + identCode));
+
+        return airport;
+    }
+
+
+
+    @Override
+    public Airport getAirportFromICAO(String icaoCode) {
+        Airport airport = airportRepository.findByIcao(icaoCode)
+                          .orElseThrow(() -> new AirportNotFoundException("Airport does not exist with ICAO: " + icaoCode));
+
+        return airport;
+    }
+
 
 
 

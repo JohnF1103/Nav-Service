@@ -4,7 +4,7 @@ public class AirportEntity {
   
     
     private String Code;
-    private double  Lat;
+    private double Lat;
     private double Long;
     
     public AirportEntity(String aCode, double aLat, double aLong) {
