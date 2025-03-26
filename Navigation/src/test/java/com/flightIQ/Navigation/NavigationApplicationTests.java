@@ -23,6 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 		  "spring.cloud.gcp.sql.database-name=flightiq",
 		  "spring.cloud.gcp.sql.instance-connection-name=${spring.cloud.gcp.sql.instance-connection-name}"
 		})
+
+		
 class NavigationApplicationTests {
 
 	@Autowired 

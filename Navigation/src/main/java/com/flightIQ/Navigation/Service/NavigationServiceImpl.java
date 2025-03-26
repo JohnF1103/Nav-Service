@@ -23,19 +23,31 @@ import java.util.*;
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
-    /* 
-    public static void getATISTest() {
-        // For testing purposes only
 
-        String apiUrl = "https://frq-svc-272565453292.us-central1.run.app/api/v1/getAirportFrequencies?airportCode=KLAX";
-        RestTemplate restTemplate = new RestTemplate(); 
-        String apiResponseJSON = restTemplate.getForObject(apiUrl, String.class); 
+    public int ComputeTrueCourse(int plottedCourse, String WindsAloftAtCruise, double lat, double lon){
 
-        // parse out ATIS 
-        String atisResponse = parseATIS(apiResponseJSON); 
-        System.out.println(atisResponse);
+        //adjust plotted course for wind correction
+        
 
-    } */
+        //adjust for E/W variation
+
+        int declination = 0;
+
+        //adjust for compass error FOR STEER, maybe import table from 75200
+
+
+        if (lat >= 0) {
+            declination = (int) (10 - (lat / 10.0));
+        } else {
+            declination = (int) (-10 + (lat / 10.0));
+        }
+
+
+        return declination;
+    }
+
+
+
 
 
     @Override
@@ -170,3 +182,4 @@ public class NavigationServiceImpl implements Navigation_svc {
     } */
 
 }
+
