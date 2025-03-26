@@ -1,5 +1,6 @@
 package com.flightIQ.Navigation;
 
+<<<<<<< HEAD
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.flightIQ.Navigation.Service.NavigationServiceImpl;
@@ -69,3 +70,24 @@ public class NavigationApplicationTests {
         System.out.println("Test passed: computeTrueCourseAndGroundSpeed (360, 270@25, 0.0, 0.0, 220)");
     }
 }
+=======
+import com.flightIQ.Navigation.Service.NavigationServiceImpl;
+
+public class NavigationApplicationTests {
+    public static void main(String[] args) {
+        NavigationServiceImpl navigationService = new NavigationServiceImpl();
+
+        // Example call to ComputeTrueCourse
+        int plottedCourse = 90;
+        String windsAloft = "180@25";
+        double lat = 26.2473600;
+        double lon = -80.1111272;
+        int trueAirspeed = 150;
+
+        int trueCourse = navigationService.ComputeTrueCourse(plottedCourse, windsAloft, lat, lon, trueAirspeed);
+        System.out.println("Computed True Course: " + trueCourse);
+
+  
+    }
+}
+>>>>>>> dccf2a63f170d6c3a3c4925430041e90017a4693
