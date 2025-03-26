@@ -74,16 +74,24 @@ ignore this func for now we will add later this week.
         return windSpeed * Math.sin(Math.toRadians(windAngle)); 
     }
 
-    public static double computeGroundSpeed(double trueAirspeed, String windSpeed, double course, double windDirection, double windCorrectionAngle) {
-        double courseRadians = Math.toRadians(course);
-        double windDirectionRadians = Math.toRadians(windDirection);
-        double windCorrectionAngleRadians = Math.toRadians(windCorrectionAngle);
-
-        double groundSpeed = Math.sqrt(
-            Math.pow(trueAirspeed, 2) + Math.pow(windSpeed, 2) -
-            (2 * trueAirspeed * string * Math.cos(courseRadians - windDirectionRadians - windCorrectionAngleRadians))
-        );
-
+  
+    public static double computeGroundSpeed(double airspeed, double windSpeed, double course, double windDirection, double windCorrectionAngle) {
+        // Convert course and wind direction from degrees to radians
+        double courseInRadians = Math.toRadians(course);
+        double windDirectionInRadians = Math.toRadians(windDirection);
+        
+        // Calculate the angle between the course and the wind direction
+        double angle = courseInRadians - windDirectionInRadians;
+        
+        // Calculate the wind component along the course
+        double windComponentAlongCourse = windSpeed * Math.cos(angle);
+        
+        // Calculate the ground speed
+        double groundSpeed = airspeed + windComponentAlongCourse;
+        
         return groundSpeed;
     }
+    
+
+
 }
