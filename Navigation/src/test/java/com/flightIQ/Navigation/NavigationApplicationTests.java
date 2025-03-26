@@ -10,29 +10,22 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-// Integration tests to test REST endpoints
-@EnabledIfSystemProperty(named = "it.cloudsql", matches = "true")
-@TestPropertySource(locations = "/Navigation/src/main/resources/application-secret.properties")
-@ExtendWith(SpringExtension.class)
-@SpringBootTest (
-		webEnvironment=WebEnvironment.RANDOM_PORT,
-		classes={NavigationApplication.class},
-		properties= {
-		  "spring.datasource.username=${spring.datasource.username}",
-		  "spring.datasource.password=${spring.datasource.password}",
-		  "spring.cloud.gcp.sql.database-name=flightiq",
-		  "spring.cloud.gcp.sql.instance-connection-name=${spring.cloud.gcp.sql.instance-connection-name}"
-		})
+import com.flightIQ.Navigation.Service.NavigationServiceImpl;
 
-		
-class NavigationApplicationTests {
+public class NavigationApplicationTests {
+    public static void main(String[] args) {
+        NavigationServiceImpl navigationService = new NavigationServiceImpl();
 
-	@Autowired 
-	private CommandLineRunner commandLineRunner;
-	
-	@Test
-	void testGoogleCloudSQLConnection() {
-		
-	}
+        // Example call to ComputeTrueCourse
+        int plottedCourse = 90;
+        String windsAloft = "180@25";
+        double lat = 26.2473600;
+        double lon = -80.1111272;
+        int trueAirspeed = 150;
 
+        int trueCourse = navigationService.ComputeTrueCourse(plottedCourse, windsAloft, lat, lon, trueAirspeed);
+        System.out.println("Computed True Course: " + trueCourse);
+
+  
+    }
 }
