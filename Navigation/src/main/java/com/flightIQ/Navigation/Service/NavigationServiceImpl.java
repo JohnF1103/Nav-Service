@@ -1,5 +1,6 @@
 package com.flightIQ.Navigation.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,37 +24,30 @@ import java.util.*;
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
+    public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
-    public int ComputeTrueCourse(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TrueAirspeed){
+        ArrayList<Integer> cars = new ArrayList<Integer>(); // Create an ArrayList object
 
-
-
+        
         //adjust plotted course for wind correction
-        int WindDir = Integer.parseInt(WindsAloftAtCruise.split("@")[0]);
-        int WindSPeed = Integer.parseInt(WindsAloftAtCruise.split("@")[1]);
-        int windAngle = Math.abs(WindDir -plottedCourse);
 
-        //compute angle of abs(plotted course and wind direction for a heading of 180 the wind is coming FROM hdg 180)
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
+        int windHeading = Integer.parseInt(WindsAloftAtCruise.split("@")[0]);
+        int windspeed = Integer.parseInt(WindsAloftAtCruise.split("@")[1]);
 
+        double crosswindComponent = computeCrosswindComponent(windHeading, windspeed, plottedCourse);
+        
+        int WCA = (int) Math.round(Math.asin( (crosswindComponent) / TAS ));
 
-        //** Keep in mind that arcsin takes in radians NOT degrees. so take a degree value and use math.toradians to convert. */
-       
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        //The wind correction angle can be calculated using the formula: WCA = arcsin (sin (Wind Angle in radians) * (Wind Speed / True Airspeed)).
-        int WCA = 0;
+        double groundSpeed = computeGroundSpeed(windHeading, windspeed, plottedCourse, TAS, WCA);
         //adjust for E/W variation
 
+
+/*
+
+ignore this func for now we will add later this week.
+
+
         int declination = 0;
-
-        //adjust for compass error FOR STEER, maybe import table from 75200
-
 
         if (lat >= 0) {
             declination = (int) (10 - (lat / 10.0));
@@ -61,17 +55,47 @@ public class NavigationServiceImpl implements Navigation_svc {
             declination = (int) (-10 + (lat / 10.0));
         }
 
+*/
 
-        return plottedCourse - WCA;
+        //adjust for compass error FOR STEER, maybe import table from 75200
+
+
+  
+        return "Data " + WCA+ " "+ groundSpeed ;
     }
 
+
+
+
+    public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
+        double windAngle = Math.abs(windDirection - course);
+
+        System.out.println(windDirection);
+        
+        return windSpeed * Math.sin(Math.toRadians(windAngle)); 
+    }
+
+
+
+
+    public static double computeGroundSpeed(double trueAirspeed, String windSpeed, double course, double windDirection, double windCorrectionAngle) {
+        double courseRadians = Math.toRadians(course);
+        double windDirectionRadians = Math.toRadians(windDirection);
+        double windCorrectionAngleRadians = Math.toRadians(windCorrectionAngle);
+
+        double groundSpeed = Math.sqrt(
+            Math.pow(trueAirspeed, 2) + Math.pow(windSpeed, 2) -
+            (2 * trueAirspeed * string * Math.cos(courseRadians - windDirectionRadians - windCorrectionAngleRadians))
+        );
+
+        return groundSpeed;
+    }
 
 
 
     @Override
     public String GetATISOFDestination(String latitude, String longitude, String DestAirportCode) {
         // TODO Auto-generated method stub
-
         /*
             TODO FOR RUSSELL: When the database connection is working, write a simple SQL query that 
                                 returns the latitiude and longitiude for DestAirportCode
