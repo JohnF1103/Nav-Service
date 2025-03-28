@@ -1,9 +1,14 @@
 package com.flightIQ.Navigation.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
+import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
+
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,27 +18,32 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name="\"FAA_Airports\"")
+@Node("Airport")
 public class Airport {
 	@Id
-	@Column(name = "IDENT")
+	@Property("ident")
 	private String ident;
 	
-	@Column(name = "ICAO_ID")
+	@Property("icao")
 	private String icao;
 	
-	@Column(name = "NAME")
+	@Property("name")
 	private String name;
 	
-	@Column(name = "LATITUDE")
+	@Property("latitude")
 	private double latitude;
 	
-	@Column(name="LONGITUDE")
+	@Property("longitude")
 	private double longitude;
 	
-	@Column(name="IAPEXISTS")
+	@Property("iapExists")
 	private int iapExists;
+	
+	@Relationship(type="HAS_DEPARTURE_FIX", direction=Direction.OUTGOING)
+	private List<FIXX> departureFixxes = new ArrayList<>();
+	
+	@Relationship(type="HAS_ARRIVAL_FIX", direction=Direction.OUTGOING)
+	private List<FIXX> arrivalFixxes = new ArrayList<>();
 	
 	@Override
 	public String toString() {

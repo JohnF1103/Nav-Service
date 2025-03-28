@@ -1,9 +1,15 @@
 package com.flightIQ.Navigation.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import java.util.ArrayList;
+import java.util.List;
+
+
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
+import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
+
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,19 +19,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name="FAA_FIXX")
+@Node("FIXX")
 public class FIXX {
 	
 	@Id
-	@Column(name="fix")
+	@Property("fixId")
 	private String fixId;
 	
-	@Column(name="lat")
+	@Property("latitude")
 	private double latitude;
 	
-	@Column(name="long")
+	@Property("longitude")
 	private double longitude;
+	
+	@Relationship(type="CONNECTS_WITH", direction = Direction.INCOMING)
+	private List<FIXX> nearbyFIXXES = new ArrayList<>();
 	
 	@Override
 	public String toString() {
