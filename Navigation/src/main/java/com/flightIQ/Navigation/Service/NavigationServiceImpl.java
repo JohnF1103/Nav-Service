@@ -68,14 +68,22 @@ public class NavigationServiceImpl implements Navigation_svc {
 
     public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
 
+        // Compute the crosswind 
         int windToward = windDirection - 180; 
-
         if (windToward < 0) {
             windToward += 360; 
         }
         int noseWindAngle = windToward - course; 
-
         double crossWind = windSpeed * Math.sin(Math.toRadians(noseWindAngle)); 
+
+        // Compute the wind correction angle (WCA)
+        int TAS = 100; // assume the true airspeed is 100 kts
+        double WCA = Math.toDegrees(Math.asin(crossWind / TAS)); 
+
+        // Compute the true course's crosswind component
+        double trueCourse = course - WCA; 
+
+        System.out.println("WCA: " + WCA + " True Course: " + trueCourse); 
         
         return crossWind; 
     }

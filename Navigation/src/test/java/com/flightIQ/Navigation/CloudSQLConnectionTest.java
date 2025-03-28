@@ -15,8 +15,7 @@ import com.flightIQ.Navigation.Repository.AirportRepository;
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class CloudSQLConnectionTest {
 	
-	@Autowired
-	private final AirportRepository airportRepository;
+	
 
 	@Test
 	void testAirportDBConnection() {
