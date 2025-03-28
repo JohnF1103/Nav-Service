@@ -14,8 +14,6 @@ public class NavigationServiceImpl implements Navigation_svc {
 
     public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
-
-
         
         //adjust plotted course for wind correction
 
@@ -24,11 +22,20 @@ public class NavigationServiceImpl implements Navigation_svc {
 
         double crosswindComponent = computeCrosswindComponent(windHeading, windspeed, plottedCourse);
         
-        int WCA = (int) Math.round(Math.asin( (crosswindComponent) / TAS ));
+      
         double groundSpeed = computeGroundSpeed(TAS , windspeed, plottedCourse, windHeading);
         //adjust for E/W variation
 
 
+        double windDirectionRad = Math.toRadians(windHeading);
+        double plottedCourseRad = Math.toRadians(plottedCourse);
+
+        // Calculate the wind correction angle (WCA)
+        double sinWCA = (windspeed * Math.sin(windDirectionRad - plottedCourseRad)) / TAS;
+        double WCA = Math.toDegrees(Math.asin(sinWCA));
+        
+
+        System.out.println("WCA->" +  WCA +" "+ TAS +" " +crosswindComponent);
 /*
 
 ignore this func for now we will add later this week.
@@ -88,5 +95,18 @@ ignore this func for now we will add later this week.
         
         return groundSpeed;
     }
+
+    private double computeFuelBurnForLeg(Aircraft aircraft, double distance, double time){
+        return 0;
+    
+    };
+
+    private double computeTimeForLeg(double groundspeed, double distance ){
+
+        return 0;
+    }
+
+
+    
 
 }

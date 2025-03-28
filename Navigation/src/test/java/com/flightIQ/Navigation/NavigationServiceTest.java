@@ -10,7 +10,7 @@ public class NavigationServiceTest {
 
         // Test case 1
         System.out.println("Test Case 1:");
-        System.out.println(service.ComputeTrueCourseAndGroundsped(90, "180@20", 26.2473600, -80.1111272, 150));
+        System.out.println(service.ComputeTrueCourseAndGroundsped(300, "230@20", 26.2473600, -80.1111272, 150));
 
         // Test case 2
         System.out.println("Test Case 2:");
