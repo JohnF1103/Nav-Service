@@ -15,7 +15,6 @@ public class NavigationServiceImpl implements Navigation_svc {
     public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
 
-        ArrayList<Integer> cars = new ArrayList<Integer>(); // Create an ArrayList object
 
         
         //adjust plotted course for wind correction
@@ -26,8 +25,7 @@ public class NavigationServiceImpl implements Navigation_svc {
         double crosswindComponent = computeCrosswindComponent(windHeading, windspeed, plottedCourse);
         
         int WCA = (int) Math.round(Math.asin( (crosswindComponent) / TAS ));
-
-        double groundSpeed = computeGroundSpeed(windHeading, windspeed, plottedCourse, TAS, WCA);
+        double groundSpeed = computeGroundSpeed(TAS , windspeed, plottedCourse, windHeading);
         //adjust for E/W variation
 
 
@@ -68,30 +66,27 @@ ignore this func for now we will add later this week.
 
         double windAngle = Math.abs(windDirection - course);
 
-        System.out.println(windDirection);
+       // System.out.println(windDirection);
         
 
         return windSpeed * Math.sin(Math.toRadians(windAngle)); 
     }
 
-  
-    public static double computeGroundSpeed(double airspeed, double windSpeed, double course, double windDirection, double windCorrectionAngle) {
+    public static double computeGroundSpeed(double airspeed, double windSpeed, double course, double windDirection) {
         // Convert course and wind direction from degrees to radians
         double courseInRadians = Math.toRadians(course);
         double windDirectionInRadians = Math.toRadians(windDirection);
         
         // Calculate the angle between the course and the wind direction
-        double angle = courseInRadians - windDirectionInRadians;
+        double angle = windDirectionInRadians - courseInRadians;
         
-        // Calculate the wind component along the course
-        double windComponentAlongCourse = windSpeed * Math.cos(angle);
+        // Calculate the headwind/tailwind component
+        double windComponent = windSpeed * Math.cos(angle);
         
         // Calculate the ground speed
-        double groundSpeed = airspeed + windComponentAlongCourse;
+        double groundSpeed = airspeed - windComponent; // Subtracting because windComponent is positive for headwind
         
         return groundSpeed;
     }
-    
-
 
 }
