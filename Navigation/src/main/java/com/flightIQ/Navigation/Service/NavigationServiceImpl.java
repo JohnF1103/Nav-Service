@@ -42,35 +42,54 @@ public class NavigationServiceImpl implements Navigation_svc {
         //adjust for E/W variation
 
 
-/*
+        /*
 
-ignore this func for now we will add later this week.
+        ignore this func for now we will add later this week.
 
 
-        int declination = 0;
+                int declination = 0;
 
-        if (lat >= 0) {
-            declination = (int) (10 - (lat / 10.0));
-        } else {
-            declination = (int) (-10 + (lat / 10.0));
-        }
+                if (lat >= 0) {
+                    declination = (int) (10 - (lat / 10.0));
+                } else {
+                    declination = (int) (-10 + (lat / 10.0));
+                }
 
-*/
+        */
 
         //adjust for compass error FOR STEER, maybe import table from 75200
 
-
-  
         return "Data " + WCA+ " "+ groundSpeed ;
     }
 
 
 
 
-    public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
-        double windAngle = Math.abs(windDirection - course);
 
+
+
+    public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
+
+        // Placeholder
+        double windAngle = Math.abs(windDirection - course);
         System.out.println(windDirection);
+
+        // Actual implementation
+        // Calculate the wind angle realtive to the aircraft heading/course
+        int windToward = windDirection - 180; 
+        if (windToward < 0) {
+            windToward += 360; 
+        }
+        int noseWindAngle = windToward - course; 
+        double crossWind = windSpeed * Math.sin(Math.toRadians(noseWindAngle)); 
+        double headWind = windSpeed * Math.cos(Math.toRadians(noseWindAngle)); 
+
+        System.out.println("Wind toward: " + windToward + " Nose wind angle: " + noseWindAngle + " Cross Wind: " + crossWind + " Head wind: " + headWind + "\n"); 
+
+        // Calculate the wind correction angle (assume true airspeed (TAS) is 100kts)
+        // double windCorrectionAngle = Math.asin()
+
+
         
         return windSpeed * Math.sin(Math.toRadians(windAngle)); 
     }
@@ -78,16 +97,23 @@ ignore this func for now we will add later this week.
 
 
 
-    public static double computeGroundSpeed(double trueAirspeed, String windSpeed, double course, double windDirection, double windCorrectionAngle) {
-        double courseRadians = Math.toRadians(course);
-        double windDirectionRadians = Math.toRadians(windDirection);
-        double windCorrectionAngleRadians = Math.toRadians(windCorrectionAngle);
 
-        double groundSpeed = Math.sqrt(
-            Math.pow(trueAirspeed, 2) + Math.pow(windSpeed, 2) -
-            (2 * trueAirspeed * string * Math.cos(courseRadians - windDirectionRadians - windCorrectionAngleRadians))
-        );
 
+
+    public static double computeGroundSpeed(double airspeed, double windSpeed, double course, double windDirection, double windCorrectionAngle) {
+        // Convert course and wind direction from degrees to radians
+        double courseInRadians = Math.toRadians(course);
+        double windDirectionInRadians = Math.toRadians(windDirection);
+        
+        // Calculate the angle between the course and the wind direction
+        double angle = courseInRadians - windDirectionInRadians;
+        
+        // Calculate the wind component along the course
+        double windComponentAlongCourse = windSpeed * Math.cos(angle);
+        
+        // Calculate the ground speed
+        double groundSpeed = airspeed + windComponentAlongCourse;
+        
         return groundSpeed;
     }
 
@@ -96,6 +122,7 @@ ignore this func for now we will add later this week.
     @Override
     public String GetATISOFDestination(String latitude, String longitude, String DestAirportCode) {
         // TODO Auto-generated method stub
+        
         /*
             TODO FOR RUSSELL: When the database connection is working, write a simple SQL query that 
                                 returns the latitiude and longitiude for DestAirportCode

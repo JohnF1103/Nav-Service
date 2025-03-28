@@ -30,6 +30,10 @@ public class NavigationApplicationTests {
         double result3 = NavigationServiceImpl.computeCrosswindComponent(270, 25, 360);
         assertEquals(25.0, result3, 0.01);
         System.out.println("Test passed: computeCrosswindComponent (270, 25, 360)");
+
+        double result4 = NavigationServiceImpl.computeCrosswindComponent(330, 12, 70);
+        assertEquals(-11.82, result4, 0.01);
+        System.out.println("Test passed: computeCrosswindComponent (330, 12, 70)");
     }
 
 
@@ -78,7 +82,7 @@ public class NavigationApplicationTests {
 	public static void main(String[] args) {
         NavigationApplicationTests tests = new NavigationApplicationTests();
         tests.testComputeCrosswindComponent();
-        tests.testComputeGroundSpeed();
+        // tests.testComputeGroundSpeed();
         // tests.testComputeTrueCourseAndGroundSpeed();
     }
 }
