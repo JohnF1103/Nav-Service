@@ -66,32 +66,18 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
 
-
-
     public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
 
-        // Placeholder
-        double windAngle = Math.abs(windDirection - course);
-        System.out.println(windDirection);
-
-        // Actual implementation
-        // Calculate the wind angle realtive to the aircraft heading/course
         int windToward = windDirection - 180; 
+
         if (windToward < 0) {
             windToward += 360; 
         }
         int noseWindAngle = windToward - course; 
+
         double crossWind = windSpeed * Math.sin(Math.toRadians(noseWindAngle)); 
-        double headWind = windSpeed * Math.cos(Math.toRadians(noseWindAngle)); 
-
-        System.out.println("Wind toward: " + windToward + " Nose wind angle: " + noseWindAngle + " Cross Wind: " + crossWind + " Head wind: " + headWind + "\n"); 
-
-        // Calculate the wind correction angle (assume true airspeed (TAS) is 100kts)
-        // double windCorrectionAngle = Math.asin()
-
-
         
-        return windSpeed * Math.sin(Math.toRadians(windAngle)); 
+        return crossWind; 
     }
 
 
