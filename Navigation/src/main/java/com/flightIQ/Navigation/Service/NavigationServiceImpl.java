@@ -24,6 +24,19 @@ import java.util.*;
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
+
+    /* Compass deviation hash table
+     * KEY: the intended heading
+     * VALUE: the difference in which you must set your heading to to compensate for the intended heading
+     * E.G. <60, 4> - for an intended heading of 060, set your heading to 064 (60+4) degrees
+     */
+    public Hashtable<Integer, Integer> compassDeviation = new Hashtable<Integer, Integer>();
+    compassDeviation.put(0, 0); 
+
+
+
+
+
     public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
         ArrayList<Integer> cars = new ArrayList<Integer>(); // Create an ArrayList object
@@ -64,8 +77,6 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
 
-
-
     public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
 
         // Compute the crosswind 
@@ -83,17 +94,14 @@ public class NavigationServiceImpl implements Navigation_svc {
         // Compute the true course's crosswind component
         double trueCourse = course - WCA; 
 
-        System.out.println("WCA: " + WCA + " True Course: " + trueCourse); 
+        // DEBUG ONLY! - print out the WCA and true course
+        System.out.println("WCA: " + Math.round(WCA * 1000)/1000.0 + " True Course: " + Math.round(trueCourse*1000)/1000.0); 
         
         return crossWind; 
     }
 
 
-
-
-
-
-
+    
     public static double computeGroundSpeed(double airspeed, double windSpeed, double course, double windDirection, double windCorrectionAngle) {
         // Convert course and wind direction from degrees to radians
         double courseInRadians = Math.toRadians(course);
