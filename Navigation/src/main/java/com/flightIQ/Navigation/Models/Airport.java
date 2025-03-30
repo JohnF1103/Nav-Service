@@ -3,12 +3,12 @@ package com.flightIQ.Navigation.Models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Node("Airport")
 public class Airport {
+
 	@Id
 	@Property("ident")
 	private String ident;
@@ -31,19 +32,20 @@ public class Airport {
 	private String name;
 	
 	@Property("latitude")
-	private double latitude;
+	private String latitude;
 	
 	@Property("longitude")
-	private double longitude;
+	private String longitude;
 	
 	@Property("iapExists")
-	private int iapExists;
+	private String iapExists;
 	
-	@Relationship(type="HAS_DEPARTURE_FIX", direction=Direction.OUTGOING)
-	private List<FIXX> departureFixxes = new ArrayList<>();
+//	@Relationship(type="HAS_DEPARTURE_FIX", direction=Direction.OUTGOING)
+//	private List<FIXX> departureFixxes = new ArrayList<>();
+//	
+//	@Relationship(type="HAS_ARRIVAL_FIX", direction=Direction.OUTGOING)
+//	private List<FIXX> arrivalFixxes = new ArrayList<>();
 	
-	@Relationship(type="HAS_ARRIVAL_FIX", direction=Direction.OUTGOING)
-	private List<FIXX> arrivalFixxes = new ArrayList<>();
 	
 	@Override
 	public String toString() {
@@ -56,5 +58,4 @@ public class Airport {
 	            ", iapExists=" + iapExists +
 	            '}';
 	}
-
 }
