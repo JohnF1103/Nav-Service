@@ -47,8 +47,6 @@ public class NavigationServiceImpl implements Navigation_svc {
         compassDeviationTable.put(300, 0); 
         compassDeviationTable.put(330, -1); 
 
-
-
         return compassDeviationTable; 
     }
 
