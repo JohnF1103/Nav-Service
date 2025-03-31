@@ -25,14 +25,32 @@ import java.util.*;
 public class NavigationServiceImpl implements Navigation_svc {
 
 
-    /* Compass deviation hash table
-     * KEY: the intended heading
-     * VALUE: the difference in which you must set your heading to to compensate for the intended heading
-     * E.G. <60, 4> - for an intended heading of 060, set your heading to 064 (60+4) degrees
-     */
-    public Hashtable<Integer, Integer> compassDeviation = new Hashtable<Integer, Integer>();
-    compassDeviation.put(0, 0); 
+    
+    public Hashtable<Integer, Integer> getCompassDeviationTable() {
+        /* Compass deviation hash table
+        * KEY: the intended heading
+        * VALUE: the difference in which you must set your heading to to compensate for the intended heading
+        * E.G. <60, 4> - for an intended heading of 060, set your heading to 064 (60+4) degrees
+        */
 
+        Hashtable<Integer, Integer> compassDeviationTable = new Hashtable<Integer, Integer>();
+        compassDeviationTable.put(0, 0); 
+        compassDeviationTable.put(30, 1); 
+        compassDeviationTable.put(60, 4); 
+        compassDeviationTable.put(90, 6); 
+        compassDeviationTable.put(120, 4); 
+        compassDeviationTable.put(150, 3); 
+        compassDeviationTable.put(180, 2); 
+        compassDeviationTable.put(210, 0); 
+        compassDeviationTable.put(240, 0); 
+        compassDeviationTable.put(270, 0); 
+        compassDeviationTable.put(300, 0); 
+        compassDeviationTable.put(330, -1); 
+
+
+
+        return compassDeviationTable; 
+    }
 
 
 
@@ -117,6 +135,20 @@ public class NavigationServiceImpl implements Navigation_svc {
         double groundSpeed = airspeed + windComponentAlongCourse;
         
         return groundSpeed;
+    }
+
+
+
+    private double computeFuelBurnForLeg(Aircraft aircraft, double distance, double time){
+        return 0;
+    
+    };
+
+
+
+    private double computeTimeForLeg(double groundspeed, double distance ){
+
+        return 0;
     }
 
 
