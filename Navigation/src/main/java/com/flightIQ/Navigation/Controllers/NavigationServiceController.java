@@ -26,4 +26,12 @@ public class NavigationServiceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    @GetMapping(value = "/ComputeNavlog")
+    public ResponseEntity<String> computeNavlog(@RequestParam String route, @RequestParam String aircraft, @RequestParam String CruiseALT, @RequestParam String TAS) {
+        try {
+            return ResponseEntity.ok(navservice.computeNavlog(route, aircraft, CruiseALT, TAS));
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

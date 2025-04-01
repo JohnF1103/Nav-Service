@@ -4,4 +4,6 @@ public interface Navigation_svc {
 
     String GetATISOFDestination(String X_coord, String Y_coord, String DestAirportCode);
 
+    String computeNavlog(String route, String aircraft, String cruiseALT, String TAS);
+
 }

@@ -1,16 +1,64 @@
+
 package com.flightIQ.Navigation.Service;
-
-
-
 import java.util.ArrayList;
-
 import org.springframework.stereotype.Service;
+import com.flightIQ.Navigation.DTO.RouteNode;
 
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
+/********************************************ENDPOINTS******************************************************/    
+    @Override
+    public String GetATISOFDestination(String X_coord, String Y_coord, String DestAirportCode) {
+        // TODO Auto-generated method stub
+
+       // System.out.println(ComputeTrueCourse(0, DestAirportCode, 26.2473600,-80.1111272 ));
+        String response = "";
+        return response;
+    }
+
+
+
+    @Override
+    public String computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
+        // TODO Auto-generated method stub
+        
+
+        // KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data point
+        //http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
+
+        String[] points = route.split(" ");
+
+        for(String location: points){
+
+            System.out.println("location: " +location);
+
+        }
+
     
+        
+        ArrayList<RouteNode> flightroute = new ArrayList<RouteNode>();
+
+        
+
+
+
+        return "";
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /***************************************HELPER FUNCTIONS******************************************************/    
 
     public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
@@ -58,23 +106,11 @@ ignore this func for now we will add later this week.
         return "Data " + WCA+ " "+ groundSpeed ;
     }
 
-    @Override
-    public String GetATISOFDestination(String X_coord, String Y_coord, String DestAirportCode) {
-        // TODO Auto-generated method stub
-
-       // System.out.println(ComputeTrueCourse(0, DestAirportCode, 26.2473600,-80.1111272 ));
-        String response = "";
-        return response;
-    }
-
 
     public static double computeCrosswindComponent(int windDirection, int windSpeed, int course) {
 
 
-        double windAngle = Math.abs(windDirection - course);
-
-       // System.out.println(windDirection);
-        
+        double windAngle = Math.abs(windDirection - course);        
 
         return windSpeed * Math.sin(Math.toRadians(windAngle)); 
     }
@@ -105,6 +141,8 @@ ignore this func for now we will add later this week.
 
         return 0;
     }
+
+   
 
 
     
