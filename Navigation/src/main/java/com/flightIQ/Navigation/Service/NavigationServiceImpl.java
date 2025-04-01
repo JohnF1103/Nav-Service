@@ -106,12 +106,6 @@ public class NavigationServiceImpl implements Navigation_svc {
         // Compute the wind correction angle (WCA)
         int TAS = 100; // assume the true airspeed is 100 kts
         double WCA = Math.toDegrees(Math.asin(crossWind / TAS)); 
-
-        // Compute the true course's crosswind component
-        double trueCourse = course - WCA; 
-
-        // DEBUG ONLY! - print out the WCA and true course
-        System.out.println("WCA: " + Math.round(WCA * 1000)/1000.0 + " True Course: " + Math.round(trueCourse*1000)/1000.0); 
         
         return crossWind; 
     }
