@@ -132,14 +132,33 @@ ignore this func for now we will add later this week.
         return groundSpeed;
     }
 
-    private double computeFuelBurnForLeg(Aircraft aircraft, double distance, double time){
-        return 0;
+    private double computeFuelBurnForLeg(Aircraft aircraft, double distance, double time, String legType){
+
+        double fuelBurn = 0.0;
+        double galsPerMin = aircraft.getCRZfuelBurn() / 60;
     
-    };
+        switch (legType.toUpperCase()) {
+            case "CLB":
+                fuelBurn = aircraft.getCLBFuelBurn() * time;
+                break;
+            case "CRZ":
+                fuelBurn = aircraft.getCRZfuelBurn() * time;
+                break;
+            case "DES":
+                fuelBurn = aircraft.getDescFuelbURN() * time;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid leg type: " + legType);
+        }
+    
+        return fuelBurn;
+    }
+    
 
     private double computeTimeForLeg(double groundspeed, double distance ){
 
-        return 0;
+        double nautical_miles_per_min = groundspeed / 60;
+        return distance * nautical_miles_per_min;
     }
 
    
