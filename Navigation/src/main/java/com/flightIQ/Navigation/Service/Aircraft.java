@@ -5,10 +5,10 @@ import lombok.Setter;
 
 public class Aircraft {
 
-    private String name; 
-    private double CLBFuelBurn;
-    private double CRZfuelBurn;
-    private double DescFuelbURN;
+    @Getter @Setter private String name; 
+    @Getter @Setter private double CLBFuelBurn;
+    @Getter @Setter private double CRZfuelBurn;
+    @Getter @Setter private double DescFuelbURN;
 
 
     public Aircraft(String aName, double CLB, double CRZ, double DES){
