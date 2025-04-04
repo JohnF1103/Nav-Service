@@ -9,18 +9,28 @@ import org.springframework.stereotype.Service;
 import com.flightIQ.Navigation.DTO.RouteNode;
 
 import com.flightIQ.Navigation.Models.Airport;
+import com.flightIQ.Navigation.Models.FIXX;
 import com.flightIQ.Navigation.Repository.AirportRepository;
+import com.flightIQ.Navigation.Repository.FIXXRepository;
 import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
+import com.flightIQ.Navigation.Exceptions.FixxNotFoundException;
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 	
 	@Autowired
 	private AirportRepository airportRepository;
+	
+	@Autowired
+	private FIXXRepository fixxRepository;
 
 	public void AirportService(AirportRepository airportRepository) {
         this.airportRepository = airportRepository;
     }
+	
+	public void FIXXService(FIXXRepository fixxRepository) {
+		this.fixxRepository = fixxRepository;
+	}
 	
 	
 /********************************************ENDPOINTS******************************************************/    
@@ -84,20 +94,19 @@ public class NavigationServiceImpl implements Navigation_svc {
         //http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
 
         String[] points = route.split(" ");
-
+        
+        
         for(String location: points){
-
-            System.out.println("location: " +location);
+        	// find if a fixx exists or not
+        	// if fixx exists, get the latitude and longitude
+        	// else pass latitude and longitude
+        	System.out.println(location);
 
         }
 
     
-        
         ArrayList<RouteNode> flightroute = new ArrayList<RouteNode>();
-
         
-
-
 
         return "";
     }

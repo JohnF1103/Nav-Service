@@ -25,7 +25,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 0.0;
         
         double expectedGroundSpeed = 150.0;
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test No Wind: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
@@ -39,7 +39,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 0.0;
         
         double expectedGroundSpeed = 180.0;
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test Tailwind: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
@@ -53,7 +53,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 0.0;
         
         double expectedGroundSpeed = 120.0;
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test Headwind: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
@@ -67,7 +67,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 24.0;
         
         double expectedGroundSpeed = Math.sqrt(Math.pow(150.0, 2) + Math.pow(30.0, 2));
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test Crosswind: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
@@ -81,7 +81,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 22.0;
         
         double expectedGroundSpeed = 160.0; // Example value, should be calculated using E6B
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test Complex Wind Scenario 1: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
@@ -95,7 +95,7 @@ public class NavigationServiceTestRunner {
         double windCorrectionAngle = 15.0;
         
         double expectedGroundSpeed = 140.0; // Example value, should be calculated using E6B
-        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection, windCorrectionAngle);
+        double actualGroundSpeed = NavigationServiceImpl.computeGroundSpeed(airspeed, windSpeed, course, windDirection);
         
         System.out.println("Test Complex Wind Scenario 2: Expected Ground Speed = " + expectedGroundSpeed + ", Actual Ground Speed = " + actualGroundSpeed);
         assertEquals(expectedGroundSpeed, actualGroundSpeed, 0.001);
