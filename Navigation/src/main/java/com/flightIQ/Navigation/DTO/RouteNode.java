@@ -1,6 +1,12 @@
 package com.flightIQ.Navigation.DTO;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+
 public class RouteNode {
     String nodeName;
     double bearing;
