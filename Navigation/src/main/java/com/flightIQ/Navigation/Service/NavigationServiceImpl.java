@@ -19,7 +19,7 @@ import com.flightIQ.Navigation.Exceptions.FixxNotFoundException;
 
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
-	
+
 	@Autowired
 	private AirportRepository airportRepository;
 	
@@ -88,37 +88,65 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
     @Override
-    public String computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
+    public ArrayList<RouteNode> computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
         // TODO Auto-generated method stub
         
 
         // KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data point
         //http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
-<<<<<<< HEAD
-
         String[] points = route.split(" ");
+        ArrayList<RouteNode> flightRoute = new ArrayList<RouteNode>();
         
-        
-        for(String location: points){
-        	// find if a fixx exists or not
-        	// if fixx exists, get the latitude and longitude
-        	// else pass latitude and longitude
-        	System.out.println(location);
-
+        for (int i = 0; i < points.length - 1; i++) {
+        	if (i == 0) {
+        		Airport airport = getAirportFromICAO(points[i]);
+        		FIXX fixx = fixxRepository.findByFixxId(points[i + 1]);
+            	
+            	if (fixx == null) {
+            		fixx = new FIXX();
+            		fixx.setFixxId(points[i + 1]);
+            		String[] formattedCoordinates = points[i + 1].substring(0,points[i].length() - 1).split(",");
+            		fixx.setLatitude(Double.parseDouble(formattedCoordinates[0]));
+            		fixx.setLongitude(Double.parseDouble(formattedCoordinates[1]));
+            	}
+        		
+            	double bearing = computeBearing(airport.getLatitude(), airport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
+                double distance = computeDistance(airport.getLatitude(), airport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
+        		
+        		flightRoute.add(new RouteNode(airport.getIcao(),bearing,distance));
+        	}
+        	else {
+        		FIXX fixx1 = fixxRepository.findByFixxId(points[i]);
+        		FIXX fixx2 = fixxRepository.findByFixxId(points[i + 1]);
+            	
+            	if (fixx1 == null) {
+            		fixx1 = new FIXX();
+            		fixx1.setFixxId(points[i]);
+            		String[] formattedCoordinates = points[i].substring(0,points[i].length() - 1).split(",");
+            		fixx1.setLatitude(Double.parseDouble(formattedCoordinates[0]));
+            		fixx1.setLongitude(Double.parseDouble(formattedCoordinates[1]));
+            	}
+            	
+            	if (fixx2 == null) {
+            		fixx2 = new FIXX();
+            		fixx2.setFixxId(points[i + 1]);
+            		String[] formattedCoordinates = points[i + 1].substring(0,points[i].length() - 1).split(",");
+            		fixx2.setLatitude(Double.parseDouble(formattedCoordinates[0]));
+            		fixx2.setLongitude(Double.parseDouble(formattedCoordinates[1]));
+            	}
+            	
+        		
+            	double bearing = computeBearing(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
+                double distance = computeDistance(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
+        		
+        		flightRoute.add(new RouteNode(fixx1.getFixxId(),bearing,distance));
+        	}
         }
-
-    
-        ArrayList<RouteNode> flightroute = new ArrayList<RouteNode>();
+  
+        Airport arrivalAirport = getAirportFromICAO(points[points.length - 1]);
+        flightRoute.add(new RouteNode(arrivalAirport.getIcao(),0.0,0.0));
         
-=======
-    
-        
-        ArrayList<RouteNode> flightroute = prepareRouteObject(route);
-
-        System.out.println(flightroute);
->>>>>>> integration
-
-        return "";
+        return flightRoute;
     }
 
 
