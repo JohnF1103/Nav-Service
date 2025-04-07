@@ -1,7 +1,5 @@
 package com.flightIQ.Navigation.Models;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -32,13 +30,13 @@ public class Airport {
 	private String name;
 	
 	@Property("latitude")
-	private String latitude;
+	private double latitude;
 	
 	@Property("longitude")
-	private String longitude;
+	private double longitude;
 	
 	@Property("iapExists")
-	private String iapExists;
+	private int iapExists;
 	
 //	@Relationship(type="HAS_DEPARTURE_FIX", direction=Direction.OUTGOING)
 //	private List<FIXX> departureFixxes = new ArrayList<>();

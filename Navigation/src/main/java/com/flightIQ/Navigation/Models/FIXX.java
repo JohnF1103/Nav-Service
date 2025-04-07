@@ -26,10 +26,10 @@ public class FIXX {
 	private String fixxId;
 	
 	@Property("latitude")
-	private String latitude;
+	private double latitude;
 	
 	@Property("longitude")
-	private String longitude;
+	private double longitude;
 	
 //	@Relationship(type="CONNECTS_WITH", direction = Direction.INCOMING)
 //	private List<FIXX> nearbyFIXXES = new ArrayList<>();
