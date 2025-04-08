@@ -1,10 +1,19 @@
 package com.flightIQ.Navigation.DTO;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class RouteNode {
-    String nodeName;
-    double bearing;
-    double distance;
+    private String nodeName;
+    private double bearing;
+    private double distance;
 
     public RouteNode(String nodeName, double bearing, double distance) {
         this.nodeName = nodeName;
