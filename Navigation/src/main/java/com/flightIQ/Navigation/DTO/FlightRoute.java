@@ -8,7 +8,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.Setter;
 
-// Used to send the route in an XML format back to the client
 @Getter
 @Setter
 @XmlRootElement(name = "flightRoute")
