@@ -18,6 +18,7 @@ import com.flightIQ.Navigation.DTO.RouteNode;
 import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Service.Navigation_svc;
+import com.flightIQ.Navigation.Exceptions.BadRequestException;
 
 
 @RestController
@@ -39,52 +40,29 @@ public class NavigationServiceController {
     
     @GetMapping(value="/getAirportByIdent")
     public ResponseEntity<Airport> getAirportByIdent(@RequestParam String identCode) {
-    	try {
-    		if (identCode.length() != 3) {
-    			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDENT code must have 3 letters");
-            }
-    		
-    		// Regex expression to check input contains only alphabets and numbers
-        	if (!identCode.matches("[A-Za-z0-9]{3}")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must contain only letters and numbers");
-            }
-    		
-    		return ResponseEntity.ok(navservice.getAirportFromIDENT(identCode));
-    	}
-    	catch (ResponseStatusException e) {
-        	// Re-throw ResponseStatusException to preserve the original status code
-    		throw e;
-    	}
-    	catch (AirportNotFoundException e) {
-    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-    	}
-    	catch (Exception e) {
-    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
-    	}
+    	if (identCode.length() != 3) {
+            throw new BadRequestException("IDENT code must have 3 letters");
+        }
+
+        // Regex expression to check input contains only alphabets and numbers
+        if (!identCode.matches("[A-Za-z0-9]{3}")) {
+            throw new BadRequestException("IDENT code must contain only letters and numbers");
+        }
+
+        return ResponseEntity.ok(navservice.getAirportFromIDENT(identCode));
     }
     
     @GetMapping(value="/getAirportByIcao")
     public ResponseEntity<Airport> getAirportByIcao(@RequestParam String icaoCode) {
-        try {
-        	if (icaoCode.length() != 4) {
-            	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must have 4 letters"); 
-            }
-        	
-        	if (!icaoCode.matches("[A-Za-z0-9]{4}")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ICAO code must contain only letters and numbers");
-            }
-        	
-            return ResponseEntity.ok(navservice.getAirportFromICAO(icaoCode));
+    	if (icaoCode.length() != 4) {
+            throw new BadRequestException("ICAO code must have 4 letters");
         }
-        catch (ResponseStatusException e) {
-        	throw e;
+
+        if (!icaoCode.matches("[A-Za-z0-9]{4}")) {
+            throw new BadRequestException("ICAO code must contain only letters and numbers");
         }
-        catch (AirportNotFoundException e) {
-    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-    	}
-        catch (Exception e) {
-        	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred processing your request");
-      }
+
+        return ResponseEntity.ok(navservice.getAirportFromICAO(icaoCode));
     }
         
     @GetMapping(value = "/ComputeNavlog")
