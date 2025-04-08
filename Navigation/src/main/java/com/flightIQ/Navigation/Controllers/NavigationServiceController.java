@@ -66,7 +66,7 @@ public class NavigationServiceController {
     }
         
     @GetMapping(value = "/ComputeNavlog")
-    public ResponseEntity<List<RouteNode>> computeNavlog(@RequestParam String route, @RequestParam String aircraft, @RequestParam String CruiseALT, @RequestParam String TAS) {
+    public ResponseEntity<String> computeNavlog(@RequestParam String route, @RequestParam String aircraft, @RequestParam String CruiseALT, @RequestParam String TAS) {
        return ResponseEntity.ok(navservice.computeNavlog(route, aircraft, CruiseALT, TAS));
     }
 }

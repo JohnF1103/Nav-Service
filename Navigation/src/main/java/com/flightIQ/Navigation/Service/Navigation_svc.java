@@ -13,5 +13,5 @@ public interface Navigation_svc {
 	Airport getAirportFromIDENT(String ident);
 	Airport getAirportFromICAO(String icaoCode);
 	FIXX getFIXXFromId(String fixxId);
-	List<RouteNode> computeNavlog(String route, String aircraft, String cruiseALT, String TAS);
+	String computeNavlog(String route, String aircraft, String cruiseALT, String TAS);
 }
