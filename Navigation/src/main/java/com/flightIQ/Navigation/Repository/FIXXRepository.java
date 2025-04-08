@@ -10,5 +10,5 @@ import com.flightIQ.Navigation.Models.FIXX;
 
 @Repository
 public interface FIXXRepository extends Neo4jRepository<FIXX, String> {
-	FIXX findByFixxId(String fixxId);
+	Optional<FIXX> findByFixxId(String fixxId);
 }
