@@ -1,9 +1,14 @@
-// package com.flightIQ.Navigation.Repository;
+package com.flightIQ.Navigation.Repository;
 
-// import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-// import com.flightIQ.Navigation.DTO.AirportEntity;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.stereotype.Repository;
 
-// public interface AirportRepository extends JpaRepository<AirportEntity, Integer>{
+import com.flightIQ.Navigation.Models.Airport;
 
-// }
+@Repository
+public interface AirportRepository extends Neo4jRepository<Airport, String> {
+	Optional<Airport> findByIdent(String ident);
+	Optional<Airport> findByIcao(String icao);
+}
