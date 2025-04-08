@@ -1,14 +1,20 @@
 package com.flightIQ.Navigation.Controllers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.flightIQ.Navigation.DTO.RouteNode;
 import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Service.Navigation_svc;
@@ -82,11 +88,7 @@ public class NavigationServiceController {
     }
         
     @GetMapping(value = "/ComputeNavlog")
-    public ResponseEntity<String> computeNavlog(@RequestParam String route, @RequestParam String aircraft, @RequestParam String CruiseALT, @RequestParam String TAS) {
-        try {
-            return ResponseEntity.ok(navservice.computeNavlog(route, aircraft, CruiseALT, TAS));
-        } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<List<RouteNode>> computeNavlog(@RequestParam String route, @RequestParam String aircraft, @RequestParam String CruiseALT, @RequestParam String TAS) {
+       return ResponseEntity.ok(navservice.computeNavlog(route, aircraft, CruiseALT, TAS));
     }
 }
