@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import com.flightIQ.Navigation.DTO.RouteNode;
@@ -85,57 +87,74 @@ public class NavigationServiceImpl implements Navigation_svc {
 		return airport;
 	}
     
-
+	@Override
+	public FIXX getFIXXFromId(String fixxId) {
+		FIXX fixx = fixxRepository.findByFixxId(fixxId)				
+					.orElseGet(() -> {
+						if (fixxId.charAt(0) == '(' && fixxId.charAt(fixxId.length() - 1) == ')') {
+							FIXX fixx1 = new FIXX();
+							fixx1.setFixxId(fixxId);
+		            		String[] formattedCoordinates = (fixxId.substring(1,fixxId.length() - 1)).split(",");
+		            		fixx1.setLatitude(Double.parseDouble(formattedCoordinates[0]));
+		            		fixx1.setLongitude(Double.parseDouble(formattedCoordinates[1]));
+		            		return fixx1;
+						}
+						else {
+							throw new FixxNotFoundException("FIXX not found with ID: " + fixxId);
+						}
+					});
+		
+		return fixx;
+	}
 
     @Override
-    public ArrayList<RouteNode> computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
-        // TODO Auto-generated method stub
-        
-
-        // KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data point
-        //http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
+    public List<RouteNode> computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
+        // Route 1: KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data point
+        // Test Case 1: http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
         String[] points = route.split(" ");
         ArrayList<RouteNode> flightRoute = new ArrayList<RouteNode>();
         
-        for (int i = 0; i < points.length - 1; i++) {
+        // Case: No Fixxes in route; ex: KJFK -> KALB
+        if (points.length == 2) {
+        	Airport departureAirport = getAirportFromICAO(points[0]);
+    		Airport arrivalAirport = getAirportFromICAO(points[1]);
+        	
+    		
+        	double bearing = computeBearing(departureAirport.getLatitude(), departureAirport.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
+            double distance = computeDistance(departureAirport.getLatitude(), departureAirport.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
+    		
+    		flightRoute.add(new RouteNode(departureAirport.getIcao(),bearing,distance));
+    		flightRoute.add(new RouteNode(arrivalAirport.getIcao(), 0.0, 0.0));
+    		return flightRoute;
+        }
+        
+        
+        for (int i = 0; i <= points.length - 2; i++) {
+        	System.out.println(points[i]);
         	if (i == 0) {
-        		Airport airport = getAirportFromICAO(points[i]);
-        		FIXX fixx = fixxRepository.findByFixxId(points[i + 1]);
+        		Airport departureAirport = getAirportFromICAO(points[i]);
+        		FIXX fixx = getFIXXFromId(points[i + 1]);
             	
-            	if (fixx == null) {
-            		fixx = new FIXX();
-            		fixx.setFixxId(points[i + 1]);
-            		String[] formattedCoordinates = points[i + 1].substring(0,points[i].length() - 1).split(",");
-            		fixx.setLatitude(Double.parseDouble(formattedCoordinates[0]));
-            		fixx.setLongitude(Double.parseDouble(formattedCoordinates[1]));
-            	}
         		
-            	double bearing = computeBearing(airport.getLatitude(), airport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
-                double distance = computeDistance(airport.getLatitude(), airport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
+            	double bearing = computeBearing(departureAirport.getLatitude(), departureAirport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
+                double distance = computeDistance(departureAirport.getLatitude(), departureAirport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
         		
-        		flightRoute.add(new RouteNode(airport.getIcao(),bearing,distance));
+        		flightRoute.add(new RouteNode(departureAirport.getIcao(),bearing,distance));
+        	}
+        	else if (i == points.length - 2) {
+        		FIXX fixx = getFIXXFromId(points[i]);
+        		Airport arrivalAirport = getAirportFromICAO(points[i + 1]);
+            	
+            	
+              	double bearing = computeBearing(fixx.getLatitude(), fixx.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
+                double distance = computeDistance(fixx.getLatitude(), fixx.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
+        		
+        		flightRoute.add(new RouteNode(fixx.getFixxId(),bearing,distance));
         	}
         	else {
-        		FIXX fixx1 = fixxRepository.findByFixxId(points[i]);
-        		FIXX fixx2 = fixxRepository.findByFixxId(points[i + 1]);
-            	
-            	if (fixx1 == null) {
-            		fixx1 = new FIXX();
-            		fixx1.setFixxId(points[i]);
-            		String[] formattedCoordinates = points[i].substring(0,points[i].length() - 1).split(",");
-            		fixx1.setLatitude(Double.parseDouble(formattedCoordinates[0]));
-            		fixx1.setLongitude(Double.parseDouble(formattedCoordinates[1]));
-            	}
-            	
-            	if (fixx2 == null) {
-            		fixx2 = new FIXX();
-            		fixx2.setFixxId(points[i + 1]);
-            		String[] formattedCoordinates = points[i + 1].substring(0,points[i].length() - 1).split(",");
-            		fixx2.setLatitude(Double.parseDouble(formattedCoordinates[0]));
-            		fixx2.setLongitude(Double.parseDouble(formattedCoordinates[1]));
-            	}
-            	
-        		
+        		FIXX fixx1 = getFIXXFromId(points[i]);
+        		FIXX fixx2 = getFIXXFromId(points[i + 1]);
+            		
             	double bearing = computeBearing(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
                 double distance = computeDistance(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
         		
@@ -145,8 +164,9 @@ public class NavigationServiceImpl implements Navigation_svc {
   
         Airport arrivalAirport = getAirportFromICAO(points[points.length - 1]);
         flightRoute.add(new RouteNode(arrivalAirport.getIcao(),0.0,0.0));
+        System.out.println(flightRoute.toString());
         
-        return flightRoute;
+        return (List<RouteNode>) flightRoute;
     }
 
 
@@ -155,37 +175,6 @@ public class NavigationServiceImpl implements Navigation_svc {
 
     public String getWindsAoft(){
         return "220@12";
-    }
-    public ArrayList<RouteNode> prepareRouteObject(String routeString) {
-        HashMap<String, String> airportsSamplegraphDB = new HashMap<>();
-        airportsSamplegraphDB.put("KPMP", "(26.2473,-80.1111)"); // Pompano Beach Airpark
-        airportsSamplegraphDB.put("KIMM", "(26.4337,-81.4005)"); // Immokalee Regional Airport
-        airportsSamplegraphDB.put("KPHK", "(26.7850,-80.6934)"); // Palm Beach County Glades Airport
-        airportsSamplegraphDB.put("2IS", "(26.7352,-81.0511)"); // Airglades Airport
-    
-        ArrayList<RouteNode> routeNodes = new ArrayList<>();
-        String[] routeParts = routeString.split(" ");
-    
-        for (int i = 0; i < routeParts.length - 1; i++) {
-            double[] currentCoords = getCoordinates(routeParts[i], airportsSamplegraphDB);
-            double[] nextCoords = getCoordinates(routeParts[i + 1], airportsSamplegraphDB);
-    
-            double bearing = computeBearing(currentCoords[0], currentCoords[1], nextCoords[0], nextCoords[1]);
-            double distance = computeDistance(currentCoords[0], currentCoords[1], nextCoords[0], nextCoords[1]);
-    
-            routeNodes.add(new RouteNode(routeParts[i], bearing, distance));
-        }
-    
-        // Add the last node with zero bearing and distance
-        routeNodes.add(new RouteNode(routeParts[routeParts.length - 1], 0, 0));
-    
-        return routeNodes;
-    }
-    
-    private double[] getCoordinates(String node, HashMap<String, String> db) {
-        String coords = db.getOrDefault(node, node).replace("(", "").replace(")", "");
-        String[] parts = coords.split(",");
-        return new double[]{Double.parseDouble(parts[0]), Double.parseDouble(parts[1])};
     }
     
     private double computeBearing(double lat1, double lon1, double lat2, double lon2) {
@@ -207,9 +196,6 @@ public class NavigationServiceImpl implements Navigation_svc {
         return R * c; // Distance in nautical miles
     }
     
-    
-    
-
 
     public String ComputeTrueCourseAndGroundsped(int plottedCourse, String WindsAloftAtCruise, double lat, double lon, int TAS){
 
