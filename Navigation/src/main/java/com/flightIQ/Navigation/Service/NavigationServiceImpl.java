@@ -91,55 +91,67 @@ public class NavigationServiceImpl implements Navigation_svc {
     @Override
     public String computeNavlog(String route, String aircraft, String cruiseALT, String TAS) {
         // TODO Auto-generated method stub
-
+    
         // KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data
         // point
         // http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
-
+    
         List<RouteNode> flightroute = prepareRouteObject(route);
-
+    
         System.out.println(flightroute);
-        System.out.println("APPLYIGN WINDS" + getWindsAoft());
-
-        double totalFuelBurn = 0;
+        System.out.println("APPLYING WINDS" + getWindsAoft());
+    
+        double totalFuelBurn = 1.5;
         double totalETE = 0;
         double totalDistance = 0; 
-
+    
+        List<Double> runningTotalFuelBurn = new ArrayList<>();
+        List<String> runningTotalETE = new ArrayList<>();
+    
         for (int i = 0; i < flightroute.size(); i++) {
             RouteNode curr = flightroute.get(i);
-
-
+    
             String phaseOfFlight = (i == 0) ? "CLB" : (i == flightroute.size() - 1) ? "DES" : "CRZ";
-
+    
             int course = (int) curr.getBearing();
-
+    
             System.out.println();
-
+    
             double groundspeed = Double.parseDouble(
                     ComputeTrueCourseAndGroundsped(course, getWindsAoft(), Integer.parseInt(TAS)).split("-")[1]);
             double truecourse = Double.parseDouble(
                     ComputeTrueCourseAndGroundsped(course, getWindsAoft(), Integer.parseInt(TAS)).split("-")[0]);
             
-            System.out.println("GRIUYNF SPEEED " + groundspeed);
             double dist = curr.getDistance();
             double timeForLeg = computeTimeForLeg(groundspeed, dist);
-
+    
             double legFuelBurn = computeFuelBurnForLeg(getAircraftFromDB(aircraft), dist, timeForLeg, phaseOfFlight);
-
+    
             totalETE += timeForLeg;
             totalFuelBurn += legFuelBurn;
             totalDistance += dist;
-
-            System.out.println("TIME FOR LEG " + timeForLeg + "leg dist " + dist);
+   
+    
+            System.out.println("TIME FOR LEG " + timeForLeg + " leg dist " + dist);
             System.out.println("FUEL BURNED " + legFuelBurn);
+
+            runningTotalFuelBurn.add(totalFuelBurn);
+            runningTotalETE.add(formatTime(totalETE));
+
         }
-
+    
         String formattedETE = formatTime(totalETE);
+    
+        System.out.println("FLIGHTROUTE OBJ " + flightroute.toString());
 
-        System.out.println("TOTAL ETE " + totalETE);
+        runningTotalETE.remove(runningTotalETE.size() -1);
+        runningTotalFuelBurn.remove(runningTotalFuelBurn.size() -1 );
 
-        return "Distance " + truncate(totalDistance) + " Total ETE: " + formattedETE + ", Total Fuel Burn: " + truncate(totalFuelBurn + 1.5) + " gallons";
+
+    
+        return "Distance " + truncate(totalDistance) + " Total ETE: " + formattedETE + ", Total Fuel Burn: " + truncate(totalFuelBurn) + " gallons" + runningTotalETE + "--" + runningTotalFuelBurn;
     }
+    
 
     private String formatTime(double totalHours) {
         int hours = (int) totalHours;
@@ -219,7 +231,7 @@ public class NavigationServiceImpl implements Navigation_svc {
   
         Airport arrivalAirport = getAirportFromICAO(points[points.length - 1]);
         flightRoute.add(new RouteNode(arrivalAirport.getIcao(),0.0,0.0));
-        System.out.println(flightRoute.toString());
+        //System.out.println(flightRoute.toString());
         
         return (List<RouteNode>) flightRoute;
     }
