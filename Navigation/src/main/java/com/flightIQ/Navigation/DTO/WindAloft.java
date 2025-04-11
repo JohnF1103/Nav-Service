@@ -15,14 +15,15 @@ public class WindAloft {
 
     public static WindAloft fromString(String data) {
         String[] parts = data.split("@");
-        if (parts.length != 4) {
+        System.out.println("LEN " + parts.length + " " + data);
+        if (parts.length != 5) {
             throw new IllegalArgumentException("Invalid WindAloft data format");
         }
         WindAloft windAloft = new WindAloft();
         windAloft.setDirection(Integer.parseInt(parts[0]));
         windAloft.setSpeed(Integer.parseInt(parts[1]));
-        windAloft.setClosestAirportCode(parts[2]);
-        windAloft.setDistanceFromOriginalAirportInMiles(Double.parseDouble(parts[3]));
+        windAloft.setClosestAirportCode(parts[3]);
+        windAloft.setDistanceFromOriginalAirportInMiles(Double.parseDouble(parts[4]));
         return windAloft;
     }
 

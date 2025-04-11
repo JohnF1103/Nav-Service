@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import com.flightIQ.Navigation.DTO.RouteNode;
-
+import com.flightIQ.Navigation.DTO.WindAloft;
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Models.FIXX;
 import com.flightIQ.Navigation.Models.WindsAloftClient;
@@ -117,6 +117,26 @@ public class NavigationServiceImpl implements Navigation_svc {
     
         List<Double> runningTotalFuelBurn = new ArrayList<>();
         List<String> runningTotalETE = new ArrayList<>();
+
+    WindAloft originWinds = getWindsAoft(flightroute.get(0).getNodeName(), Integer.parseInt(cruiseALT));
+    System.out.println("HAVE WINDS FOR" + originWinds );
+
+    WindAloft destinationWinds = getWindsAoft(flightroute.get(flightroute.size() - 1).getNodeName(), Integer.parseInt(cruiseALT));
+    System.out.println("HAVE WINDS FOR" + destinationWinds );
+
+    // Calculate the average wind data for use throughout the flight
+
+    int avgDirection = (int) Math.round((originWinds.getDirection() + destinationWinds.getDirection()) / 2.0);
+
+    int avgSpeed = (int) Math.round((originWinds.getSpeed() + destinationWinds.getSpeed()) / 2.0);
+
+    String avgwinds = avgDirection + "@" + avgSpeed;
+
+
+    System.out.println("USING AVG WINDS OF " + avgwinds);
+
+
+
     
         for (int i = 0; i < flightroute.size(); i++) {
             RouteNode curr = flightroute.get(i);
@@ -128,10 +148,8 @@ public class NavigationServiceImpl implements Navigation_svc {
             System.out.println();
     
             double groundspeed = Double.parseDouble(
-                    ComputeTrueCourseAndGroundsped(course, getWindsAoft(flightroute.get(0).getNodeName(), Integer.parseInt(cruiseALT)), Integer.parseInt(TAS)).split("-")[1]);
-            double truecourse = Double.parseDouble(
-                    ComputeTrueCourseAndGroundsped(course, getWindsAoft(flightroute.get(0).getNodeName(), Integer.parseInt(cruiseALT)), Integer.parseInt(TAS)).split("-")[0]);
-            
+                    ComputeTrueCourseAndGroundsped(course, avgwinds, Integer.parseInt(TAS)).split("-")[1]);
+           
             double dist = curr.getDistance();
             double timeForLeg = computeTimeForLeg(groundspeed, dist);
     
@@ -178,10 +196,11 @@ public class NavigationServiceImpl implements Navigation_svc {
      * HELPER FUNCTIONS
      ******************************************************/
 
-    public String getWindsAoft(String ICAO, int altitude) {
+    public WindAloft getWindsAoft(String ICAO, int altitude) {
 
-        System.out.println( Windclient.getWindsAloftByIcao(ICAO, altitude).toString());
-        return "246@16";
+        System.out.println("GETTING WINDS FOR " + ICAO + " ALTITUDE " + altitude);
+       return Windclient.getWindsAloftByIcao(ICAO, altitude);
+       
     }
 
 
