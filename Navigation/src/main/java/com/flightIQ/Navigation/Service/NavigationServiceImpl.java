@@ -202,7 +202,7 @@ public class NavigationServiceImpl implements Navigation_svc {
 
 
     
-        return "Distance " + truncate(totalDistance) + " Total ETE: " + formattedETE + ", Total Fuel Burn: " + truncate(totalFuelBurn) + " gallons" + runningTotalETE + "--" + runningTotalFuelBurn;
+        return "Distance " + truncate(totalDistance) + "^Total ETE: " + formattedETE + "^Total Fuel Burn: " + truncate(totalFuelBurn) + "gallons^" + runningTotalETE + "^" + runningTotalFuelBurn +"^" + flightroute.toString();
     }
     
 
