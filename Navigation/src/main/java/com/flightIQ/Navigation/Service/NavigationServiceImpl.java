@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Bean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import com.flightIQ.Navigation.DTO.RouteNode;
@@ -25,6 +27,25 @@ import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 import com.flightIQ.Navigation.Exceptions.FixxNotFoundException;
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
+
+       
+
+    private final Map<Integer, Integer> compassDeviationTable = Map.ofEntries(
+        Map.entry(0, 0),
+        Map.entry(30, 1),
+        Map.entry(60, 4),
+        Map.entry(90, 6),
+        Map.entry(120, 4),
+        Map.entry(150, 3),
+        Map.entry(180, 2),
+        Map.entry(210, 0),
+        Map.entry(240, 0),
+        Map.entry(270, 0),
+        Map.entry(300, 0),
+        Map.entry(330, -1)
+    );
+
+
 
 
     @Autowired
@@ -105,7 +126,7 @@ public class NavigationServiceImpl implements Navigation_svc {
     
         // KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data
         // point
-        // http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
+        // http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=PA-28-151&CruiseALT=4500&TAS=118
     
         List<RouteNode> flightroute = prepareRouteObject(route);
     
@@ -149,6 +170,10 @@ public class NavigationServiceImpl implements Navigation_svc {
     
             double groundspeed = Double.parseDouble(
                     ComputeTrueCourseAndGroundsped(course, avgwinds, Integer.parseInt(TAS)).split("-")[1]);
+            int truecourse = Integer.parseInt(ComputeTrueCourseAndGroundsped(course, avgwinds, Integer.parseInt(TAS)).split("-")[0]);
+            System.out.println("CHANGING " + curr.getBearing() + " TO " + truecourse);
+            
+            curr.setBearing(truecourse);
            
             double dist = curr.getDistance();
             double timeForLeg = computeTimeForLeg(groundspeed, dist);
@@ -292,27 +317,30 @@ public class NavigationServiceImpl implements Navigation_svc {
         int windHeading = Integer.parseInt(WindsAloftAtCruise.split("@")[0]);
         int windspeed = Integer.parseInt(WindsAloftAtCruise.split("@")[1]);
     
-        // Calculate the ground speed using the provided function
         double groundSpeed = computeGroundSpeed(TAS, windspeed, plottedCourse, windHeading);
     
-        // Normalize the difference to be within -180 to 180 degrees.
         double angleDiff = ((windHeading - plottedCourse + 540) % 360) - 180;
         double angleDiffRad = Math.toRadians(angleDiff);
-        
-        // Compute sin(WCA) using the normalized angle difference
+    
         double sinWCA = (windspeed * Math.sin(angleDiffRad)) / TAS;
-        
-        // Clip sinWCA to the valid range to avoid Math.asin throwing an exception
-        sinWCA = Math.max(-1.0, Math.min(1.0, sinWCA));
-        
-        // Compute the wind correction angle (WCA)
+        sinWCA = Math.max(-1.0, Math.min(1.0, sinWCA));  // clamp to avoid asin domain errors
+    
         double WCA = Math.toDegrees(Math.asin(sinWCA));
-        
-        // Calculate the true course and normalize it to 0-360 degrees
         int truecourse = (int) ((plottedCourse + WCA + 360) % 360);
     
-        return truecourse + "-" + groundSpeed;
+        // === Compass deviation adjustment ===
+        Map<Integer, Integer> deviationTable = compassDeviationTable;
+    
+        // Round to the nearest key (typically in 30° increments)
+        int rounded = ((truecourse + 15) / 30) * 30 % 360;
+    
+        // Apply deviation adjustment
+        int deviation = deviationTable.getOrDefault(rounded, 0);
+        int adjustedTrueCourse = (truecourse + deviation + 360) % 360;
+    
+        return adjustedTrueCourse + "-" + Math.round(groundSpeed);
     }
+    
     
 
  
