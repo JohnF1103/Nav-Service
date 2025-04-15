@@ -72,14 +72,14 @@ public class NavigationServiceImpl implements Navigation_svc {
         double destAirportLong = destAirport.getLongitude(); 
         String destAirportATIS = ""; 
 
-        System.out.println(apiResponseJSON);
-
         // return the ATIS frequency if the aircraft is within 10 nm of the destination airport
         if (haversine_formula(latitudeString, longitudeString, destAirportLat, destAirportLong) <= 10.0) {
-            destAirportATIS = parseATIS(apiResponseJSON); ; // replace with freq service url call
+            try {
+                destAirportATIS = parseATIS(apiResponseJSON);
+            } catch(Exception e) {
+                System.out.println("Error retreiving ATIS\n"); 
+            }
         }
-
-        // System.out.println(haversine_formula(latitudeString, longitudeString, destAirportLat, destAirportLong));
 
         return destAirportATIS;
     }
