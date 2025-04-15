@@ -221,78 +221,113 @@ public class NavigationServiceImpl implements Navigation_svc {
      * HELPER FUNCTIONS
      ******************************************************/
 
-    public WindAloft getWindsAoft(String ICAO, int altitude) {
-
+     public WindAloft getWindsAoft(String ICAO, int altitude) {
         System.out.println("GETTING WINDS FOR " + ICAO + " ALTITUDE " + altitude);
-       return Windclient.getWindsAloftByIcao(ICAO, altitude);
-       
+    
+        WindAloft wind = Windclient.getWindsAloftByIcao(ICAO, altitude);
+    
+        if (wind == null) {
+            System.out.println("Wind data is null. Returning default 000@0.");
+            WindAloft defaultWind = new WindAloft();
+            defaultWind.setDirection(0);
+            defaultWind.setSpeed(0);
+            defaultWind.setClosestAirportCode(ICAO);
+            defaultWind.setDistanceFromOriginalAirportInMiles(0.0);
+            return defaultWind;
+        }
+    
+        // Additional safety: treat variable wind (0 deg and 0 speed) as default too
+        if (wind.getDirection() == 0 && wind.getSpeed() == 0) {
+            System.out.println("Variable or calm wind detected. Normalized to 000@0.");
+        }
+    
+        return wind;
     }
+    
 
 
     
     public List<RouteNode> prepareRouteObject(String routeString) {
-         // Route 1: KIMM (26.2241,-81.3186) (26.2233,-80.4911) (26.2407,-80.2758) KPMP test data point
-        // Test Case 1: http://localhost:8080/api/v1/ComputeNavlog?route=KIMM%20(26.2241,-81.3186)%20(26.2233,-80.4911)%20(26.2407,-80.2758)%20KPMP&aircraft=yourAircraft&CruiseALT=4500&TAS=118
-      
         String[] points = routeString.split(" ");
-        ArrayList<RouteNode> flightRoute = new ArrayList<RouteNode>();
-        
-        // Case: No Fixxes in route; ex: KJFK -> KALB
+        ArrayList<RouteNode> flightRoute = new ArrayList<>();
+    
+        // Handle simple direct airport-to-airport route
         if (points.length == 2) {
-        	Airport departureAirport = getAirportFromICAO(points[0]);
-    		Airport arrivalAirport = getAirportFromICAO(points[1]);
-        	
-    		
-        	double bearing = computeBearing(departureAirport.getLatitude(), departureAirport.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
-            double distance = computeDistance(departureAirport.getLatitude(), departureAirport.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
-    		
-    		flightRoute.add(new RouteNode(departureAirport.getIcao(),bearing,distance));
-    		flightRoute.add(new RouteNode(arrivalAirport.getIcao(), 0.0, 0.0));
-    		return flightRoute;
+            Airport departureAirport = getAirportFromICAO(points[0]);
+            Airport arrivalAirport = getAirportFromICAO(points[1]);
+    
+            double bearing = computeBearing(
+                departureAirport.getLatitude(), departureAirport.getLongitude(),
+                arrivalAirport.getLatitude(), arrivalAirport.getLongitude()
+            );
+            double distance = computeDistance(
+                departureAirport.getLatitude(), departureAirport.getLongitude(),
+                arrivalAirport.getLatitude(), arrivalAirport.getLongitude()
+            );
+    
+            flightRoute.add(new RouteNode(departureAirport.getIcao(), bearing, distance));
+            flightRoute.add(new RouteNode(arrivalAirport.getIcao(), 0.0, 0.0));
+            return flightRoute;
         }
-        
-        
-        for (int i = 0; i <= points.length - 2; i++) {
-        	System.out.println(points[i]);
-        	if (i == 0) {
-        		Airport departureAirport = getAirportFromICAO(points[i]);
-        		FIXX fixx = getFIXXFromId(points[i + 1]);
-            	
-        		
-            	double bearing = computeBearing(departureAirport.getLatitude(), departureAirport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
-                double distance = computeDistance(departureAirport.getLatitude(), departureAirport.getLongitude(), fixx.getLatitude(), fixx.getLongitude());
-        		
-        		flightRoute.add(new RouteNode(departureAirport.getIcao(),bearing,distance));
-        	}
-        	else if (i == points.length - 2) {
-        		FIXX fixx = getFIXXFromId(points[i]);
-        		Airport arrivalAirport = getAirportFromICAO(points[i + 1]);
-            	
-            	
-              	double bearing = computeBearing(fixx.getLatitude(), fixx.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
-                double distance = computeDistance(fixx.getLatitude(), fixx.getLongitude(), arrivalAirport.getLatitude(), arrivalAirport.getLongitude());
-        		
-        		flightRoute.add(new RouteNode(fixx.getFixxId(),bearing,distance));
-        	}
-        	else {
-        		FIXX fixx1 = getFIXXFromId(points[i]);
-        		FIXX fixx2 = getFIXXFromId(points[i + 1]);
-            		
-            	double bearing = computeBearing(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
-                double distance = computeDistance(fixx1.getLatitude(), fixx1.getLongitude(), fixx2.getLatitude(), fixx2.getLongitude());
-        		
-        		flightRoute.add(new RouteNode(fixx1.getFixxId(),bearing,distance));
-        	}
+    
+        for (int i = 0; i < points.length - 1; i++) {
+            LatLon from = getLatLon(points[i]);
+            LatLon to = getLatLon(points[i + 1]);
+    
+            double bearing = computeBearing(from.lat, from.lon, to.lat, to.lon);
+            double distance = computeDistance(from.lat, from.lon, to.lat, to.lon);
+    
+            String fromId = getIdentifier(points[i]);
+            flightRoute.add(new RouteNode(fromId, bearing, distance));
         }
-  
-        Airport arrivalAirport = getAirportFromICAO(points[points.length - 1]);
-        flightRoute.add(new RouteNode(arrivalAirport.getIcao(),0.0,0.0));
-        //System.out.println(flightRoute.toString());
-        
-        return (List<RouteNode>) flightRoute;
+    
+        // Add the final point with 0.0 values
+        String finalId = getIdentifier(points[points.length - 1]);
+        flightRoute.add(new RouteNode(finalId, 0.0, 0.0));
+    
+        return flightRoute;
     }
+    
 
  
+
+        // Represents a parsed lat/lon coordinate
+    private static class LatLon {
+        public double lat;
+        public double lon;
+        public LatLon(double lat, double lon) {
+            this.lat = lat;
+            this.lon = lon;
+        }
+    }
+
+    private LatLon getLatLon(String point) {
+        if (point.matches("\\(.*?,.*?\\)")) {
+            String[] coord = point.replace("(", "").replace(")", "").split(",");
+            return new LatLon(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
+        } else if (isICAO(point)) {
+            Airport airport = getAirportFromICAO(point);
+            return new LatLon(airport.getLatitude(), airport.getLongitude());
+        } else {
+            FIXX fixx = getFIXXFromId(point);
+            return new LatLon(fixx.getLatitude(), fixx.getLongitude());
+        }
+    }
+
+    private String getIdentifier(String point) {
+        if (point.matches("\\(.*?,.*?\\)")) {
+            return point; // keep raw lat/lon string
+        } else if (isICAO(point)) {
+            return point; // ICAO code
+        } else {
+            return point; // fix ID
+        }
+    }
+
+    private boolean isICAO(String point) {
+        return point.length() == 4 && point.matches("[A-Z]{4}");
+    }
+
 
     private double computeBearing(double lat1, double lon1, double lat2, double lon2) {
         double dLon = Math.toRadians(lon2 - lon1);
