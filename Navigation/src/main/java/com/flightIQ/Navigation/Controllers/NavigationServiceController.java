@@ -1,14 +1,15 @@
 package com.flightIQ.Navigation.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.flightIQ.Navigation.Service.Navigation_svc;
+import com.flightIQ.Navigation.Service.NavigationService;
+import com.flightIQ.Navigation.models.StateVector;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -16,14 +17,24 @@ import com.flightIQ.Navigation.Service.Navigation_svc;
 public class NavigationServiceController {
 
     @Autowired
-    private Navigation_svc navservice;
+    private NavigationService _navService;
 
-    @GetMapping(value = "/getATISOfDestination")
-    public ResponseEntity<String> getATISOfDestination(@RequestParam String airportCode) {
-        try {
-            return ResponseEntity.ok(navservice.GetATISOFDestination("42.212323","-72",airportCode));
-        } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    @GetMapping(value = "/getStateVectors", params = { "lamin", "lomin", "lamax", "lomax" })
+    public StateVector[] getVectorsByBoundingBox(
+            @RequestParam float lamin,
+            @RequestParam float lomin,
+            @RequestParam float lamax,
+            @RequestParam float lomax) {
+        return _navService.getStateVectors(lamin, lomin, lamax, lomax);
     }
+
+    @GetMapping("/getStateVectorsUS")
+    public StateVector[] getVectorsInUS() {
+        return _navService.getStateVectorsUS();
+    }
+
+    // @GetMapping("/airportFrequencies")
+    // public AirportFrequencies getAirportFrequencies(@RequestParam String ICAO) {
+    //     return _navService.getAirportFrequencies(ICAO);
+    // }
 }
