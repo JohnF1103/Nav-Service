@@ -1,11 +1,18 @@
 
 package com.flightIQ.Navigation.Service;
-import com.flightIQ.Navigation.DTO.Aircraft;
-import com.flightIQ.Navigation.DTO.AircraftDB;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flightIQ.Navigation.DTO.*;
 
+import java.time.Instant;
 import java.util.Optional;
+import com.fasterxml.jackson.core.type.TypeReference;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
@@ -15,9 +22,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import com.flightIQ.Navigation.DTO.RouteNode;
-import com.flightIQ.Navigation.DTO.WindAloft;
 import com.flightIQ.Navigation.Models.Airport;
 import com.flightIQ.Navigation.Models.FIXX;
 import com.flightIQ.Navigation.Models.WindsAloftClient;
@@ -25,6 +31,11 @@ import com.flightIQ.Navigation.Repository.AirportRepository;
 import com.flightIQ.Navigation.Repository.FIXXRepository;
 import com.flightIQ.Navigation.Exceptions.AirportNotFoundException;
 import com.flightIQ.Navigation.Exceptions.FixxNotFoundException;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
 @Service
 public class NavigationServiceImpl implements Navigation_svc {
 
@@ -57,6 +68,24 @@ public class NavigationServiceImpl implements Navigation_svc {
     private WindsAloftClient Windclient;
 
 
+    private static final String ENDPOINT_OPENSKY = "https://opensky-network.org/api";
+    private static final String ENDPOINT_OPENSKY_AUTH = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token";
+
+    private static final ObjectMapper OBJ_MAPPER = new ObjectMapper(); // Maps StateVectors from API to a List
+    private final RestTemplate _restTemplate = new RestTemplate();
+    private final Logger _logger = LoggerFactory.getLogger(NavigationServiceImpl.class);
+
+    private static final float[] US_BOUNDING_BOX = new float[] {24.5f, -125.0f, 49.5f, -66.9f}; // {lamin, lomin, lamax, lomax}
+
+    @Value("${opensky.client-id}")
+    private String clientId;
+
+    @Value("${opensky.client-secret}")
+    private String clientSecret;
+
+    private AccessToken openskyToken;
+
+
     public NavigationServiceImpl(WindsAloftClient windsAloftClient) {
         this.Windclient = windsAloftClient;
     }
@@ -74,6 +103,77 @@ public class NavigationServiceImpl implements Navigation_svc {
     /********************************************
      * ENDPOINTS
      ******************************************************/
+
+
+
+    private void configureAccessToken() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "client_credentials");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map> response = _restTemplate.postForEntity(ENDPOINT_OPENSKY_AUTH, request, Map.class);
+
+        // Access Token expires after 30 minutes. So reconfigure after 28 minutes.
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            String accessToken = (String) response.getBody().get("access_token");
+            openskyToken = new AccessToken(accessToken, Instant.now().plusSeconds(1680));
+        } else {
+            _logger.error("configureAccessToken: Failed to obtain AccessToken.");
+        }
+    }
+
+
+    private StateVector[] parseRawVectors(String rawJson) {
+        try {
+            Map<String, Object> map = OBJ_MAPPER.readValue(rawJson, new TypeReference<>() {});
+            List<List<Object>> rawStates = (List<List<Object>>) map.get("states");
+
+            if (rawStates == null) return new StateVector[0];
+            return rawStates.stream().map(StateVector::fromList).toArray(StateVector[]::new);
+
+        } catch (JsonProcessingException e) {
+            _logger.error(">>>Error Processing Raw Vectors<<<", e);
+            return null;
+        }
+    }
+
+
+    @Override
+    public StateVector[] getStateVectors(float lamin, float lomin, float lamax, float lomax) {
+        // Check Token
+        if (openskyToken == null || openskyToken.expired())
+            configureAccessToken();
+
+        // Build URI
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ENDPOINT_OPENSKY+"/states/all");
+        uriBuilder.queryParam("lamin", lamin);
+        uriBuilder.queryParam("lomin", lomin);
+        uriBuilder.queryParam("lamax", lamax);
+        uriBuilder.queryParam("lomax", lomax);
+
+        // Build request
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(openskyToken.getToken());
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        // Send Endpoint output
+        return parseRawVectors(_restTemplate.exchange(uriBuilder.toUriString(), HttpMethod.GET, request, String.class).getBody());
+    }
+
+
+    @Override
+    public StateVector[] getStateVectorsUS() {
+        return getStateVectors(US_BOUNDING_BOX[0], US_BOUNDING_BOX[1], US_BOUNDING_BOX[2], US_BOUNDING_BOX[3]);
+    }
+
+
+
     @Override
     public String GetATISOFDestination(String X_coord, String Y_coord, String DestAirportCode) {
         // TODO Auto-generated method stub
@@ -204,7 +304,6 @@ public class NavigationServiceImpl implements Navigation_svc {
     
         return "Distance " + truncate(totalDistance) + "^Total ETE: " + formattedETE + "^Total Fuel Burn: " + truncate(totalFuelBurn) + "gallons^" + runningTotalETE + "^" + runningTotalFuelBurn +"^" + flightroute.toString();
     }
-    
 
     private String formatTime(double totalHours) {
         int hours = (int) totalHours;

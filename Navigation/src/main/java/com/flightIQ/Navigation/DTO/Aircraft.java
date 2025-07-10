@@ -2,17 +2,17 @@ package com.flightIQ.Navigation.DTO;
 import lombok.Getter;
 import lombok.Setter;
 
-
+@Getter
+@Setter
 public class Aircraft {
 
-    @Getter @Setter private String name; 
-    @Getter @Setter private double CLBFuelBurn;  
-    @Getter @Setter private double CRZfuelBurn;
-    @Getter @Setter private double DescFuelbURN;
-
-    @Getter @Setter private int takeoffDistance;
-    @Getter @Setter private int landingDistance;
-    @Getter @Setter private int basicEmptyWeight;
+    private String name;
+    private double CLBFuelBurn;
+    private double CRZfuelBurn;
+    private double DescFuelbURN;
+    private int takeoffDistance;
+    private int landingDistance;
+    private int basicEmptyWeight;
 
     public Aircraft(String aName, double CLB, double CRZ, double DES, int takeoffDist, int landingDist, int emptyWeight) {
         this.name = aName;
